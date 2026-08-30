@@ -2,1243 +2,456 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Kiwi Renovator</title>
 
 <style>
-  * {
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-  }
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;overflow:hidden;font-family:Arial,sans-serif;background:#111;color:white;touch-action:none}
+canvas{display:block}
 
-  body {
-    margin: 0;
-    overflow: hidden;
-    font-family: Arial, sans-serif;
-    background: #111;
-    color: white;
-    touch-action: none;
-  }
+#startScreen{
+ position:fixed;inset:0;z-index:30;
+ background:linear-gradient(#708b99,#29362e);
+ display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center
+}
+#startScreen h1{font-size:42px;margin:0;color:#fff}
+#startScreen p{color:#e5e5e5;line-height:1.5}
+#startBtn{
+ padding:17px 38px;border:0;border-radius:10px;
+ background:#e58a2b;color:#fff;font-size:18px;font-weight:bold
+}
 
-  canvas {
-    display: block;
-  }
+#ui{position:fixed;inset:0;pointer-events:none;z-index:10}
+.panel{
+ background:rgba(10,15,18,.82);border:1px solid rgba(255,255,255,.18);
+ border-radius:10px;padding:12px 15px
+}
+#job{position:absolute;top:12px;left:12px;max-width:300px}
+#job h3{margin:0 0 8px;color:#f0a13b}
+#job p{margin:6px 0;font-size:14px}
+.done{color:#70df82;text-decoration:line-through}
+#money{position:absolute;top:12px;right:12px;font-size:18px;font-weight:bold}
+#toolPanel{position:absolute;bottom:15px;left:50%;transform:translateX(-50%);display:flex;gap:6px}
+.tool{
+ pointer-events:auto;background:rgba(15,20,24,.9);border:2px solid #555;
+ color:#fff;padding:9px 11px;border-radius:8px;font-size:12px
+}
+.tool.active{border-color:#e58a2b;background:#53371f}
+#crosshair{
+ position:absolute;left:50%;top:50%;width:18px;height:18px;
+ transform:translate(-50%,-50%)
+}
+#crosshair:before,#crosshair:after{
+ content:"";position:absolute;background:white
+}
+#crosshair:before{width:2px;height:18px;left:8px}
+#crosshair:after{height:2px;width:18px;top:8px}
+#prompt{
+ position:absolute;bottom:105px;left:50%;transform:translateX(-50%);
+ background:rgba(0,0,0,.8);padding:11px 17px;border-radius:9px;
+ display:none;text-align:center
+}
+#message{
+ position:absolute;top:120px;left:50%;transform:translateX(-50%);
+ background:rgba(30,110,55,.92);padding:12px 18px;border-radius:8px;
+ display:none;text-align:center
+}
 
-  #loading {
-    position: fixed;
-    inset: 0;
-    background: #182027;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    z-index: 20;
-    text-align: center;
-  }
+#mobile{display:none;position:fixed;inset:0;pointer-events:none;z-index:20}
+#joy{
+ position:absolute;bottom:30px;left:25px;width:125px;height:125px;
+ border-radius:50%;background:rgba(255,255,255,.12);
+ border:2px solid rgba(255,255,255,.35);pointer-events:auto
+}
+#stick{
+ position:absolute;width:52px;height:52px;border-radius:50%;
+ background:rgba(255,255,255,.55);left:34px;top:34px
+}
+#use{
+ position:absolute;bottom:45px;right:28px;width:105px;height:105px;
+ border-radius:50%;border:3px solid rgba(255,255,255,.5);
+ background:rgba(229,138,43,.88);color:#fff;font-weight:bold;font-size:17px;
+ pointer-events:auto
+}
+#look{position:absolute;right:28px;bottom:165px;font-size:12px;color:#ddd;text-align:center}
 
-  #loading h1 {
-    font-size: 38px;
-    margin-bottom: 10px;
-  }
-
-  #loading p {
-    color: #b8c4cc;
-    margin-bottom: 25px;
-  }
-
-  #start {
-    background: #e48b2c;
-    color: white;
-    border: none;
-    padding: 18px 35px;
-    border-radius: 10px;
-    font-size: 18px;
-    font-weight: bold;
-  }
-
-  #ui {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 10;
-  }
-
-  #topbar {
-    position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
-    display: flex;
-    justify-content: space-between;
-  }
-
-  .panel {
-    background: rgba(10, 15, 18, 0.8);
-    border: 1px solid rgba(255,255,255,0.18);
-    border-radius: 10px;
-    padding: 12px 15px;
-    backdrop-filter: blur(8px);
-  }
-
-  #job {
-    max-width: 310px;
-  }
-
-  #job h3 {
-    margin: 0 0 8px;
-    color: #f0a13b;
-  }
-
-  #job p {
-    margin: 5px 0;
-    font-size: 14px;
-  }
-
-  .done {
-    color: #72d572;
-    text-decoration: line-through;
-  }
-
-  #money {
-    font-size: 18px;
-    font-weight: bold;
-    height: fit-content;
-  }
-
-  #crosshair {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 22px;
-    height: 22px;
-    transform: translate(-50%, -50%);
-  }
-
-  #crosshair::before,
-  #crosshair::after {
-    content: "";
-    position: absolute;
-    background: white;
-  }
-
-  #crosshair::before {
-    width: 2px;
-    height: 22px;
-    left: 10px;
-  }
-
-  #crosshair::after {
-    height: 2px;
-    width: 22px;
-    top: 10px;
-  }
-
-  #prompt {
-    position: absolute;
-    bottom: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.75);
-    padding: 12px 20px;
-    border-radius: 10px;
-    text-align: center;
-    display: none;
-  }
-
-  #message {
-    position: absolute;
-    top: 120px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(34, 140, 60, 0.9);
-    padding: 12px 20px;
-    border-radius: 8px;
-    display: none;
-  }
-
-  /* MOBILE CONTROLS */
-
-  #mobileControls {
-    display: none;
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 15;
-  }
-
-  #joystick {
-    position: absolute;
-    bottom: 35px;
-    left: 30px;
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.12);
-    border: 2px solid rgba(255,255,255,0.3);
-    pointer-events: auto;
-  }
-
-  #stick {
-    position: absolute;
-    width: 55px;
-    height: 55px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.55);
-    left: 36px;
-    top: 36px;
-  }
-
-  #use {
-    position: absolute;
-    right: 35px;
-    bottom: 50px;
-    width: 105px;
-    height: 105px;
-    border-radius: 50%;
-    border: 3px solid rgba(255,255,255,0.5);
-    background: rgba(228,139,44,0.8);
-    color: white;
-    font-size: 18px;
-    font-weight: bold;
-    pointer-events: auto;
-  }
-
-  #lookHint {
-    position: absolute;
-    right: 25px;
-    bottom: 175px;
-    color: rgba(255,255,255,0.7);
-    font-size: 12px;
-    text-align: center;
-  }
-
-  @media (max-width: 800px) {
-    #mobileControls {
-      display: block;
-    }
-
-    #topbar {
-      top: 8px;
-      left: 8px;
-      right: 8px;
-    }
-
-    #job {
-      max-width: 235px;
-    }
-
-    #job p {
-      font-size: 12px;
-    }
-  }
+@media(max-width:800px){
+ #mobile{display:block}
+ #job{max-width:245px}
+ #job p{font-size:12px}
+ #toolPanel{bottom:8px}
+ .tool{font-size:10px;padding:8px}
+}
 </style>
 </head>
 
 <body>
 
-<div id="loading">
-  <h1>🔨 KIWI RENOVATOR</h1>
-  <p>Water Damage Repair<br>Early 2000s NZ Home</p>
-  <button id="start">START JOB</button>
+<div id="startScreen">
+ <h1>🔨 KIWI RENOVATOR</h1>
+ <p><b>JOB #001 — WATER DAMAGE REPAIR</b><br>Early-2000s NZ Home</p>
+ <button id="startBtn">START JOB</button>
 </div>
 
 <div id="ui">
+ <div id="job" class="panel">
+  <h3>JOB #001</h3>
+  <p id="task1">☐ Find the damaged bedroom</p>
+  <p id="task2">☐ Remove damaged GIB</p>
+  <p id="task3">☐ Repair timber framing</p>
+  <p id="task4">☐ Install new GIB</p>
+ </div>
 
-  <div id="topbar">
+ <div id="money" class="panel">💰 $0</div>
+ <div id="crosshair"></div>
+ <div id="prompt"></div>
+ <div id="message"></div>
 
-    <div id="job" class="panel">
-      <h3>JOB #001</h3>
-      <p>☐ Find the damaged bedroom</p>
-      <p id="repairTask">☐ Repair damaged wall</p>
-    </div>
-
-    <div id="money" class="panel">
-      💰 $0
-    </div>
-
-  </div>
-
-  <div id="crosshair"></div>
-
-  <div id="prompt">
-    Damaged GIB wall<br>
-    <strong>Press E or USE to repair</strong>
-  </div>
-
-  <div id="message"></div>
-
+ <div id="toolPanel">
+  <button class="tool active" data-tool="inspect">🔍 Inspect</button>
+  <button class="tool" data-tool="hammer">🔨 Hammer</button>
+  <button class="tool" data-tool="nailgun">🔫 Nail Gun</button>
+ </div>
 </div>
 
-<div id="mobileControls">
-
-  <div id="joystick">
-    <div id="stick"></div>
-  </div>
-
-  <div id="lookHint">
-    Drag screen<br>to look around
-  </div>
-
-  <button id="use">USE<br>🔨</button>
-
+<div id="mobile">
+ <div id="joy"><div id="stick"></div></div>
+ <div id="look">Drag screen<br>to look</div>
+ <button id="use">USE<br>🔨</button>
 </div>
-
 
 <script type="module">
-
-import * as THREE from
-'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
-
-
-let scene, camera, renderer;
-let yaw = 0;
-let pitch = 0;
-
-let keys = {};
-let damagedWall;
-let repaired = false;
-
-let moveX = 0;
-let moveZ = 0;
-
-const raycaster = new THREE.Raycaster();
-
-
-/* ---------- START ---------- */
-
-document.getElementById("start").addEventListener("click", () => {
-
-  document.getElementById("loading").style.display = "none";
-
-  init();
-  animate();
-
-});
-
-
-/* ---------- THREE JS ---------- */
-
-function init() {
-
-  scene = new THREE.Scene();
-
-  scene.background = new THREE.Color(0x9bb8c9);
-  scene.fog = new THREE.Fog(0x9bb8c9, 20, 70);
-
-
-  camera = new THREE.PerspectiveCamera(
-    75,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
-  );
-
-  camera.position.set(0, 1.7, 8);
-
-
-  renderer = new THREE.WebGLRenderer({
-    antialias: true
-  });
-
-  renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-  );
-
-  renderer.shadowMap.enabled = true;
-
-  document.body.appendChild(renderer.domElement);
-
-
-  /* LIGHTING */
-
-  const sun = new THREE.DirectionalLight(
-    0xffffff,
-    2
-  );
-
-  sun.position.set(10, 15, 8);
-  sun.castShadow = true;
-
-  scene.add(sun);
-
-  scene.add(
-    new THREE.HemisphereLight(
-      0xbfdcff,
-      0x5b6b4b,
-      2
-    )
-  );
-
-
-  createHouse();
-  createFurniture();
-
-
-  window.addEventListener(
-    "resize",
-    resize
-  );
-
-  window.addEventListener(
-    "keydown",
-    keyDown
-  );
-
-  window.addEventListener(
-    "keyup",
-    keyUp
-  );
-
-
-  /* DESKTOP MOUSE LOOK */
-
-  renderer.domElement.addEventListener(
-    "click",
-    () => {
-
-      if (window.innerWidth > 800) {
-
-        renderer.domElement.requestPointerLock();
-
-      }
-
-    }
-  );
-
-
-  document.addEventListener(
-    "mousemove",
-    mouseLook
-  );
-
-
-  /* MOBILE LOOK */
-
-  let lastX = 0;
-  let lastY = 0;
-  let touching = false;
-
-
-  renderer.domElement.addEventListener(
-    "touchstart",
-    (e) => {
-
-      if (
-        e.touches[0].clientX >
-        window.innerWidth * 0.35
-      ) {
-
-        touching = true;
-
-        lastX =
-          e.touches[0].clientX;
-
-        lastY =
-          e.touches[0].clientY;
-
-      }
-
-    },
-    { passive: false }
-  );
-
-
-  renderer.domElement.addEventListener(
-    "touchmove",
-    (e) => {
-
-      if (!touching) return;
-
-      const touch = e.touches[0];
-
-      yaw -=
-        (touch.clientX - lastX) *
-        0.006;
-
-      pitch -=
-        (touch.clientY - lastY) *
-        0.006;
-
-      pitch = Math.max(
-        -1.4,
-        Math.min(1.4, pitch)
-      );
-
-      lastX = touch.clientX;
-      lastY = touch.clientY;
-
-    },
-    { passive: false }
-  );
-
-
-  renderer.domElement.addEventListener(
-    "touchend",
-    () => {
-      touching = false;
-    }
-  );
-
-
-  setupJoystick();
-
-
-  document
-    .getElementById("use")
-    .addEventListener(
-      "click",
-      tryRepair
-    );
-
-}
-
-
-/* ---------- HOUSE ---------- */
-
-function createHouse() {
-
-  /* GROUND */
-
-  const ground = new THREE.Mesh(
-
-    new THREE.PlaneGeometry(
-      100,
-      100
-    ),
-
-    new THREE.MeshStandardMaterial({
-      color: 0x5c8245
-    })
-
-  );
-
-  ground.rotation.x =
-    -Math.PI / 2;
-
-  ground.receiveShadow = true;
-
-  scene.add(ground);
-
-
-  /* FLOOR */
-
-  const floor = new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-      12,
-      0.15,
-      12
-    ),
-
-    new THREE.MeshStandardMaterial({
-      color: 0x8b765c
-    })
-
-  );
-
-  floor.position.y = 0;
-
-  floor.receiveShadow = true;
-
-  scene.add(floor);
-
-
-  /* ROOM WALL MATERIAL */
-
-  const wallMaterial =
-    new THREE.MeshStandardMaterial({
-      color: 0xe6e1d8
-    });
-
-
-  /* BACK WALL */
-
-  addWall(
-    0,
-    2.5,
-    -5.8,
-    12,
-    5,
-    0.25,
-    wallMaterial
-  );
-
-
-  /* LEFT WALL */
-
-  addWall(
-    -5.8,
-    2.5,
-    0,
-    0.25,
-    5,
-    12,
-    wallMaterial
-  );
-
-
-  /* RIGHT WALL */
-
-  addWall(
-    5.8,
-    2.5,
-    0,
-    0.25,
-    5,
-    12,
-    wallMaterial
-  );
-
-
-  /* CEILING */
-
-  const ceiling = new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-      12,
-      0.2,
-      12
-    ),
-
-    new THREE.MeshStandardMaterial({
-      color: 0xf0ede7
-    })
-
-  );
-
-  ceiling.position.y = 5;
-
-  scene.add(ceiling);
-
-
-  /* DAMAGED WALL */
-
-  damagedWall = new THREE.Mesh(
-
-    new THREE.BoxGeometry(
-      3.2,
-      2.6,
-      0.2
-    ),
-
-    new THREE.MeshStandardMaterial({
-      color: 0x795b45,
-      roughness: 1
-    })
-
-  );
-
-  damagedWall.position.set(
-    0,
-    2.2,
-    -5.55
-  );
-
-  damagedWall.name =
-    "damagedWall";
-
-  scene.add(damagedWall);
-
-
-  /* WATER STAIN */
-
-  const stain = new THREE.Mesh(
-
-    new THREE.CircleGeometry(
-      0.7,
-      32
-    ),
-
-    new THREE.MeshStandardMaterial({
-      color: 0x4d4035
-    })
-
-  );
-
-  stain.position.set(
-    0.6,
-    3.2,
-    -5.67
-  );
-
-  scene.add(stain);
-
-
-  /* NZ STYLE WINDOW */
-
-  const windowFrame =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        2.5,
-        1.7,
-        0.15
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0x444444
-      })
-
-    );
-
-  windowFrame.position.set(
-    -5.65,
-    3,
-    -1
-  );
-
-  scene.add(windowFrame);
-
-
-  /* WINDOW GLASS */
-
-  const glass =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        2.15,
-        1.35,
-        0.08
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0x8fc7dd,
-        transparent: true,
-        opacity: 0.7
-      })
-
-    );
-
-  glass.position.set(
-    -5.78,
-    3,
-    -1
-  );
-
-  scene.add(glass);
-
-
-}
-
-
-/* ---------- WALL FUNCTION ---------- */
-
-function addWall(
-  x,
-  y,
-  z,
-  width,
-  height,
-  depth,
-  material
-) {
-
-  const wall =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        width,
-        height,
-        depth
-      ),
-
-      material
-
-    );
-
-  wall.position.set(
-    x,
-    y,
-    z
-  );
-
-  wall.receiveShadow = true;
-
-  scene.add(wall);
-
-}
-
-
-/* ---------- FURNITURE ---------- */
-
-function createFurniture() {
-
-  /* BED */
-
-  const bed =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        3,
-        0.6,
-        2
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0x555555
-      })
-
-    );
-
-  bed.position.set(
-    3,
-    0.6,
-    -2
-  );
-
-  scene.add(bed);
-
-
-  /* MATTRESS */
-
-  const mattress =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        2.9,
-        0.3,
-        1.9
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0xe8e8e2
-      })
-
-    );
-
-  mattress.position.set(
-    3,
-    1.05,
-    -2
-  );
-
-  scene.add(mattress);
-
-
-  /* TOOLBOX */
-
-  const toolbox =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        1.2,
-        0.5,
-        0.6
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0xd32f2f
-      })
-
-    );
-
-  toolbox.position.set(
-    -3.5,
-    0.4,
-    2
-  );
-
-  scene.add(toolbox);
-
-}
-
-
-/* ---------- KEYBOARD ---------- */
-
-function keyDown(e) {
-
-  keys[e.key.toLowerCase()] =
-    true;
-
-  if (
-    e.key.toLowerCase() === "e"
-  ) {
-
-    tryRepair();
-
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+let scene,camera,renderer;
+let yaw=0,pitch=0,keys={};
+let moveX=0,moveZ=0;
+let selectedTool="inspect";
+let jobStage=0;
+let damagedWall,framingWall,newGib;
+const raycaster=new THREE.Raycaster();
+
+document.getElementById("startBtn").onclick=()=>{
+ document.getElementById("startScreen").style.display="none";
+ init(); animate();
+};
+
+function init(){
+ scene=new THREE.Scene();
+ scene.background=new THREE.Color(0x9bb7c7);
+ scene.fog=new THREE.Fog(0x9bb7c7,25,80);
+
+ camera=new THREE.PerspectiveCamera(75,innerWidth/innerHeight,.1,100);
+ camera.position.set(0,1.7,9);
+
+ renderer=new THREE.WebGLRenderer({antialias:true});
+ renderer.setSize(innerWidth,innerHeight);
+ renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+ renderer.shadowMap.enabled=true;
+ document.body.appendChild(renderer.domElement);
+
+ const sun=new THREE.DirectionalLight(0xfff3df,2.3);
+ sun.position.set(10,15,8); sun.castShadow=true; scene.add(sun);
+ scene.add(new THREE.HemisphereLight(0xc7e1ff,0x52643d,1.8));
+
+ createHouse();
+ createFurniture();
+
+ addEventListener("resize",resize);
+ addEventListener("keydown",e=>{
+  keys[e.key.toLowerCase()]=true;
+  if(e.key.toLowerCase()==="e")interact();
+ });
+ addEventListener("keyup",e=>keys[e.key.toLowerCase()]=false);
+
+ renderer.domElement.addEventListener("click",()=>{
+  if(innerWidth>800)renderer.domElement.requestPointerLock();
+ });
+
+ document.addEventListener("mousemove",e=>{
+  if(document.pointerLockElement!==renderer.domElement)return;
+  yaw-=e.movementX*.002;
+  pitch-=e.movementY*.002;
+  pitch=Math.max(-1.35,Math.min(1.35,pitch));
+ });
+
+ let lx=0,ly=0,looking=false;
+ renderer.domElement.addEventListener("touchstart",e=>{
+  if(e.touches[0].clientX>innerWidth*.35){
+   looking=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;
   }
+ },{passive:false});
 
+ renderer.domElement.addEventListener("touchmove",e=>{
+  if(!looking)return;
+  let t=e.touches[0];
+  yaw-=(t.clientX-lx)*.006;
+  pitch-=(t.clientY-ly)*.006;
+  pitch=Math.max(-1.35,Math.min(1.35,pitch));
+  lx=t.clientX;ly=t.clientY;
+ },{passive:false});
+
+ renderer.domElement.addEventListener("touchend",()=>looking=false);
+
+ document.getElementById("use").onclick=interact;
+ setupJoystick();
+
+ document.querySelectorAll(".tool").forEach(b=>{
+  b.onclick=()=>{
+   selectedTool=b.dataset.tool;
+   document.querySelectorAll(".tool").forEach(x=>x.classList.remove("active"));
+   b.classList.add("active");
+   showMessage("Selected: "+b.textContent);
+  };
+ });
 }
 
+function mat(color){return new THREE.MeshStandardMaterial({color,roughness:.8});}
 
-function keyUp(e) {
-
-  keys[e.key.toLowerCase()] =
-    false;
-
+function box(w,h,d,x,y,z,color){
+ const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));
+ m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
 }
 
+function createHouse(){
+ // outside ground
+ const ground=new THREE.Mesh(
+  new THREE.PlaneGeometry(100,100),
+  new THREE.MeshStandardMaterial({color:0x608647})
+ );
+ ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 
-/* ---------- MOUSE LOOK ---------- */
+ // floor - early 2000s house interior
+ box(18,.15,14,0,0,0,0x8d775e);
 
-function mouseLook(e) {
+ // external / room walls
+ const wall=0xe8e2d8;
+ box(18,5,.25,0,2.5,-6.8,wall);
+ box(18,5,.25,0,2.5,6.8,wall);
+ box(.25,5,14,-8.8,2.5,0,wall);
+ box(.25,5,14,8.8,2.5,0,wall);
 
-  if (
-    document.pointerLockElement !==
-    renderer.domElement
-  ) return;
+ // hallway divider
+ box(.2,5,8,-1.5,2.5,-2.8,wall);
 
+ // bedroom walls
+ box(6,.25,5,4.7,2.5,-2.5,wall);
+ box(.25,5,5,1.7,2.5,-4.2,wall);
 
-  yaw -= e.movementX * 0.002;
+ // lounge divider
+ box(.2,5,6,-3.5,2.5,3.5,wall);
 
-  pitch -=
-    e.movementY * 0.002;
+ // ceiling
+ box(18,.15,14,0,5.05,0,0xf1eee8);
 
+ // carpet zones
+ box(6,.03,5,4.7,.12,-2.5,0x7b7b75);
+ box(7,.03,5,-5,.12,-2.5,0x72716e);
 
-  pitch = Math.max(
-    -1.4,
-    Math.min(1.4, pitch)
-  );
+ // damaged GIB panel in bedroom
+ damagedWall=box(3,2.5,.18,4.7,2.2,-4.05,0x80614b);
+ damagedWall.name="damagedGib";
 
+ // water stain
+ const stain=new THREE.Mesh(
+  new THREE.CircleGeometry(.7,28),
+  new THREE.MeshStandardMaterial({color:0x4b4036})
+ );
+ stain.position.set(5.2,3.1,-4.16);
+ scene.add(stain);
+
+ // framing hidden initially
+ framingWall=new THREE.Group();
+ for(let i=-1;i<=1;i++)boxFrame(4.7+i,2.2,-4.18);
+ framingWall.visible=false;scene.add(framingWall);
+
+ // new GIB hidden initially
+ newGib=box(3,2.5,.16,4.7,2.2,-4.08,0xe8e3da);
+ newGib.visible=false;
+
+ // simple NZ-style aluminium windows
+ createWindow(-8.65,3,0,0);
+ createWindow(8.65,3,-1,0);
+
+ // doorway markers
+ createDoor(-1.4,0,1);
+ createDoor(1.8,-4.1,0);
 }
 
-
-/* ---------- JOYSTICK ---------- */
-
-function setupJoystick() {
-
-  const joystick =
-    document.getElementById(
-      "joystick"
-    );
-
-  const stick =
-    document.getElementById(
-      "stick"
-    );
-
-
-  joystick.addEventListener(
-    "touchmove",
-    (e) => {
-
-      e.preventDefault();
-
-      const rect =
-        joystick.getBoundingClientRect();
-
-      const touch =
-        e.touches[0];
-
-
-      let x =
-        touch.clientX -
-        (rect.left + rect.width / 2);
-
-      let y =
-        touch.clientY -
-        (rect.top + rect.height / 2);
-
-
-      const distance =
-        Math.sqrt(
-          x * x + y * y
-        );
-
-      const max = 45;
-
-
-      if (distance > max) {
-
-        x =
-          (x / distance) * max;
-
-        y =
-          (y / distance) * max;
-
-      }
-
-
-      stick.style.transform =
-        `translate(${x}px, ${y}px)`;
-
-
-      moveX = x / max;
-      moveZ = y / max;
-
-    },
-    { passive: false }
-  );
-
-
-  joystick.addEventListener(
-    "touchend",
-    () => {
-
-      moveX = 0;
-      moveZ = 0;
-
-      stick.style.transform =
-        "translate(0px, 0px)";
-
-    }
-  );
-
+function boxFrame(x,y,z){
+ const timber=new THREE.Mesh(
+  new THREE.BoxGeometry(.12,2.7,.18),
+  new THREE.MeshStandardMaterial({color:0xc39a65})
+ );
+ timber.position.set(x,y,z);
+ framingWall.add(timber);
 }
 
+function createWindow(x,y,z){
+ const frame=box(.12,1.8,2.6,x,y,z,0x414141);
+ const glass=box(.08,1.45,2.25,x+(x<0?.1:-.1),y,z,0x9dc8dc);
+ glass.material.transparent=true;glass.material.opacity=.65;
+}
 
-/* ---------- INTERACTION ---------- */
+function createDoor(x,z){
+ const door=box(1.1,2.4,.12,x,1.2,z,0x8b6849);
+ door.name="door";
+}
 
-function tryRepair() {
+function createFurniture(){
+ // bed
+ box(2.8,.55,2,6.5,.55,-1.8,0x4c4c4c);
+ box(2.7,.3,1.9,6.5,1,-1.8,0xe7e3dc);
 
-  if (repaired) return;
+ // couch
+ box(3,.7,1.2,-5,.7,2,0x59666c);
+ box(3,.8,.25,-5,1.35,2.45,0x59666c);
 
+ // kitchen bench
+ box(4,.9,.7,5.5,.9,4.8,0x6f5844);
+ box(4.1,.08,.85,5.5,1.4,4.8,0xd0c6b8);
 
-  const direction =
-    new THREE.Vector3();
+ // toolbox
+ box(1.1,.45,.55,2.8,.4,-1.5,0xd52d2d);
+}
 
-  camera.getWorldDirection(
-    direction
-  );
+function setupJoystick(){
+ const joy=document.getElementById("joy");
+ const stick=document.getElementById("stick");
 
+ joy.addEventListener("touchmove",e=>{
+  e.preventDefault();
+  const r=joy.getBoundingClientRect(),t=e.touches[0];
+  let x=t.clientX-(r.left+r.width/2);
+  let y=t.clientY-(r.top+r.height/2);
+  const dist=Math.hypot(x,y),max=42;
+  if(dist>max){x=x/dist*max;y=y/dist*max;}
+  stick.style.transform=`translate(${x}px,${y}px)`;
+  moveX=x/max;moveZ=y/max;
+ },{passive:false});
 
-  raycaster.set(
-    camera.position,
-    direction
-  );
+ joy.addEventListener("touchend",()=>{
+  moveX=0;moveZ=0;stick.style.transform="translate(0,0)";
+ });
+}
 
+function interact(){
+ if(jobStage===0){
+  const d=camera.position.distanceTo(damagedWall.position);
+  if(d<5){
+   jobStage=1;
+   document.getElementById("task1").innerHTML="☑ Find the damaged bedroom";
+   document.getElementById("task1").classList.add("done");
+   showMessage("Damage found! Select Hammer and remove the damaged GIB.");
+  }else showMessage("Explore the house and find the damaged bedroom.");
+  return;
+ }
 
-  const hits =
-    raycaster.intersectObject(
-      damagedWall
-    );
-
-
-  if (
-    hits.length > 0 &&
-    hits[0].distance < 5
-  ) {
-
-    repaired = true;
-
-
-    damagedWall.material.color.set(
-      0xe6e1d8
-    );
-
-
-    document
-      .getElementById(
-        "repairTask"
-      )
-      .innerHTML =
-      "☑ Repair damaged wall";
-
-    document
-      .getElementById(
-        "repairTask"
-      )
-      .classList.add(
-        "done"
-      );
-
-
-    document
-      .getElementById(
-        "money"
-      )
-      .innerHTML =
-      "💰 $500";
-
-
-    showMessage(
-      "Great job! Wall repaired. +$500"
-    );
-
-
-    document
-      .getElementById(
-        "prompt"
-      )
-      .style.display =
-      "none";
-
-  } else {
-
-    showMessage(
-      "Get closer and aim at the damaged wall."
-    );
-
+ if(jobStage===1){
+  if(selectedTool!=="hammer"){
+   showMessage("You need the 🔨 Hammer to remove damaged GIB.");
+   return;
   }
+  if(camera.position.distanceTo(damagedWall.position)<5){
+   damagedWall.visible=false;
+   framingWall.visible=true;
+   jobStage=2;
+   document.getElementById("task2").innerHTML="☑ Remove damaged GIB";
+   document.getElementById("task2").classList.add("done");
+   showMessage("GIB removed! Inspect the exposed timber framing.");
+  }else showMessage("Aim at the damaged wall and move closer.");
+  return;
+ }
 
-}
-
-
-function showMessage(text) {
-
-  const message =
-    document.getElementById(
-      "message"
-    );
-
-  message.textContent = text;
-
-  message.style.display =
-    "block";
-
-
-  setTimeout(
-    () => {
-
-      message.style.display =
-        "none";
-
-    },
-    2500
-  );
-
-}
-
-
-/* ---------- GAME LOOP ---------- */
-
-function animate() {
-
-  requestAnimationFrame(
-    animate
-  );
-
-
-  const speed = 0.06;
-
-
-  let forward = 0;
-  let sideways = 0;
-
-
-  if (keys["w"]) forward += 1;
-  if (keys["s"]) forward -= 1;
-
-  if (keys["a"]) sideways -= 1;
-  if (keys["d"]) sideways += 1;
-
-
-  forward += -moveZ;
-  sideways += moveX;
-
-
-  const direction =
-    new THREE.Vector3(
-      Math.sin(yaw),
-      0,
-      Math.cos(yaw)
-    );
-
-
-  const right =
-    new THREE.Vector3(
-      Math.cos(yaw),
-      0,
-      -Math.sin(yaw)
-    );
-
-
-  camera.position.addScaledVector(
-    direction,
-    -forward * speed
-  );
-
-
-  camera.position.addScaledVector(
-    right,
-    sideways * speed
-  );
-
-
-  /* ROOM BOUNDARIES */
-
-  camera.position.x =
-    Math.max(
-      -5.3,
-      Math.min(
-        5.3,
-        camera.position.x
-      )
-    );
-
-
-  camera.position.z =
-    Math.max(
-      -5.3,
-      Math.min(
-        5.3,
-        camera.position.z
-      )
-    );
-
-
-  camera.rotation.order =
-    "YXZ";
-
-  camera.rotation.y = yaw;
-  camera.rotation.x = pitch;
-
-
-  checkWallPrompt();
-
-
-  renderer.render(
-    scene,
-    camera
-  );
-
-}
-
-
-/* ---------- PROMPT ---------- */
-
-function checkWallPrompt() {
-
-  if (repaired) return;
-
-
-  const distance =
-    camera.position.distanceTo(
-      damagedWall.position
-    );
-
-
-  const prompt =
-    document.getElementById(
-      "prompt"
-    );
-
-
-  if (distance < 5) {
-
-    prompt.style.display =
-      "block";
-
-  } else {
-
-    prompt.style.display =
-      "none";
-
+ if(jobStage===2){
+  if(selectedTool!=="inspect"){
+   showMessage("Use 🔍 Inspect to check the timber framing.");
+   return;
   }
+  if(camera.position.distanceTo(damagedWall.position)<5){
+   jobStage=3;
+   document.getElementById("task3").innerHTML="☑ Repair timber framing";
+   document.getElementById("task3").classList.add("done");
+   showMessage("Framing repaired! Select the Nail Gun to install new GIB.");
+  }else showMessage("Move closer to the exposed framing.");
+  return;
+ }
 
+ if(jobStage===3){
+  if(selectedTool!=="nailgun"){
+   showMessage("Use the Nail Gun to install the new GIB.");
+   return;
+  }
+  if(camera.position.distanceTo(damagedWall.position)<5){
+   framingWall.visible=false;
+   newGib.visible=true;
+   jobStage=4;
+   document.getElementById("task4").innerHTML="☑ Install new GIB";
+   document.getElementById("task4").classList.add("done");
+   document.getElementById("money").textContent="💰 $850";
+   showMessage("🎉 JOB COMPLETE! Water damage repaired. +$850");
+  }else showMessage("Move closer to the wall.");
+ }
 }
 
-
-/* ---------- RESIZE ---------- */
-
-function resize() {
-
-  camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
-
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-  );
-
+function showMessage(text){
+ const m=document.getElementById("message");
+ m.textContent=text;m.style.display="block";
+ clearTimeout(window.msgTimer);
+ window.msgTimer=setTimeout(()=>m.style.display="none",2600);
 }
 
+function updatePrompt(){
+ const p=document.getElementById("prompt");
+ if(jobStage===0 && camera.position.distanceTo(damagedWall.position)<5){
+  p.innerHTML="Water-damaged bedroom<br><b>Press USE to inspect</b>";
+  p.style.display="block";
+ }else if(jobStage===1 && camera.position.distanceTo(damagedWall.position)<5){
+  p.innerHTML="Damaged GIB wall<br><b>Use 🔨 Hammer</b>";
+  p.style.display="block";
+ }else if(jobStage===2 && camera.position.distanceTo(damagedWall.position)<5){
+  p.innerHTML="Exposed timber framing<br><b>Use 🔍 Inspect</b>";
+  p.style.display="block";
+ }else if(jobStage===3 && camera.position.distanceTo(damagedWall.position)<5){
+  p.innerHTML="Ready for new GIB<br><b>Use 🔫 Nail Gun</b>";
+  p.style.display="block";
+ }else p.style.display="none";
+}
+
+function animate(){
+ requestAnimationFrame(animate);
+
+ let forward=0,side=0;
+ if(keys.w)forward++;
+ if(keys.s)forward--;
+ if(keys.a)side--;
+ if(keys.d)side++;
+ forward+=-moveZ;side+=moveX;
+
+ const speed=.065;
+ const dir=new THREE.Vector3(Math.sin(yaw),0,Math.cos(yaw));
+ const right=new THREE.Vector3(Math.cos(yaw),0,-Math.sin(yaw));
+
+ camera.position.addScaledVector(dir,-forward*speed);
+ camera.position.addScaledVector(right,side*speed);
+
+ camera.position.x=Math.max(-8.2,Math.min(8.2,camera.position.x));
+ camera.position.z=Math.max(-6.2,Math.min(6.2,camera.position.z));
+
+ camera.rotation.order="YXZ";
+ camera.rotation.y=yaw;
+ camera.rotation.x=pitch;
+
+ updatePrompt();
+ renderer.render(scene,camera);
+}
+
+function resize(){
+ camera.aspect=innerWidth/innerHeight;
+ camera.updateProjectionMatrix();
+ renderer.setSize(innerWidth,innerHeight);
+}
 </script>
-
 </body>
 </html>
