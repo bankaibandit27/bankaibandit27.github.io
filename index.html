@@ -2,9 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-<title>Kiwi Renovator - Bedroom Repair</title>
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+>
+
+<title>Kiwi Renovator</title>
 
 <style>
 * {
@@ -12,13 +16,15 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-html, body {
+html,
+body {
   margin: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  font-family: Arial, sans-serif;
-  background: #111;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #101416;
+  color: white;
   touch-action: none;
 }
 
@@ -26,321 +32,757 @@ canvas {
   display: block;
 }
 
-/* ---------- START SCREEN ---------- */
+/* =========================
+   START SCREEN
+========================= */
 
 #startScreen {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background:
-    linear-gradient(rgba(10,15,18,.78), rgba(10,15,18,.92)),
-    url("https://images.unsplash.com/photo-1600566753086-00f18fb6b3ea?auto=format&fit=crop&w=1600&q=80")
-    center/cover;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
+  background:
+    linear-gradient(
+      rgba(7, 12, 15, 0.68),
+      rgba(7, 12, 15, 0.9)
+    ),
+    radial-gradient(
+      circle at center,
+      #38434a,
+      #111719 70%
+    );
 }
 
 .startCard {
-  width: min(90%, 500px);
-  padding: 32px;
-  border-radius: 18px;
-  background: rgba(16,22,25,.93);
-  border: 1px solid rgba(255,255,255,.12);
-  box-shadow: 0 20px 80px rgba(0,0,0,.6);
-  color: white;
+  width: min(88%, 650px);
+
+  padding: 42px 32px;
+
+  background: rgba(13, 21, 25, 0.94);
+
+  border: 1px solid
+    rgba(255,255,255,0.12);
+
+  border-radius: 28px;
+
+  box-shadow:
+    0 25px 80px
+    rgba(0,0,0,0.6);
 }
 
-.startCard h1 {
-  margin: 0 0 8px;
-  font-size: 38px;
-  color: #e89a38;
+.gameTitle {
+  margin: 0;
+
+  font-size: clamp(
+    42px,
+    9vw,
+    72px
+  );
+
+  letter-spacing: 3px;
+
+  color: #f2a333;
+
+  font-weight: 900;
 }
 
-.startCard h2 {
-  margin: 0 0 25px;
+.jobTitle {
+  margin-top: 20px;
+
+  font-size:
+    clamp(22px,5vw,34px);
+
+  color: #e8e8e8;
+
+  font-weight: 500;
+}
+
+.jobInfo {
+  margin-top: 35px;
+
+  padding: 24px;
+
+  background:
+    rgba(255,255,255,0.03);
+
+  border-radius: 16px;
+
+  color: #c9d0d3;
+
   font-size: 18px;
-  color: #ddd;
-  font-weight: normal;
+
+  line-height: 1.6;
 }
 
-.jobBox {
-  background: #11191d;
-  padding: 18px;
-  border-radius: 12px;
-  margin-bottom: 22px;
-}
-
-.jobBox p {
-  color: #b9c4c9;
-  line-height: 1.5;
+.jobInfo b {
+  color: white;
 }
 
 #startBtn {
   width: 100%;
-  padding: 17px;
+
+  margin-top: 35px;
+
+  padding: 22px;
+
   border: none;
-  border-radius: 10px;
-  background: #d98727;
+
+  border-radius: 16px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0a02d,
+      #d97812
+    );
+
   color: white;
-  font-size: 19px;
+
+  font-size: 24px;
+
   font-weight: bold;
+
+  letter-spacing: 1px;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 10px 30px
+    rgba(226,128,20,0.25);
 }
 
-/* ---------- HUD ---------- */
+#startBtn:active {
+  transform: scale(0.98);
+}
+
+/* =========================
+   HUD
+========================= */
 
 #hud {
   position: fixed;
+
   inset: 0;
-  z-index: 5;
+
+  z-index: 10;
+
   pointer-events: none;
 }
+
+/* JOB PANEL */
 
 #jobPanel {
   position: absolute;
+
   top: 20px;
   left: 20px;
-  width: min(370px, 45vw);
-  background: rgba(13,20,23,.92);
-  color: white;
-  padding: 20px;
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.12);
+
+  width: min(
+    390px,
+    calc(100vw - 40px)
+  );
+
+  padding: 22px;
+
+  background:
+    rgba(10,16,19,0.88);
+
+  border:
+    1px solid
+    rgba(255,255,255,0.12);
+
+  border-radius: 18px;
+
+  backdrop-filter:
+    blur(12px);
+
+  pointer-events: auto;
 }
 
-#jobPanel h2 {
-  margin: 0 0 14px;
-  color: #e89a38;
-  font-size: 25px;
+.jobNumber {
+  color: #f2a333;
+
+  font-size: 22px;
+
+  font-weight: bold;
+
+  letter-spacing: 2px;
+}
+
+#taskList {
+  margin-top: 16px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
 }
 
 .task {
-  margin: 12px 0;
-  color: #d6dfe2;
+  color: #d7d7d7;
+
   font-size: 16px;
+
+  transition: 0.3s;
 }
 
 .task.done {
-  color: #89cf90;
-  text-decoration: line-through;
+  color: #8bd59a;
+
+  text-decoration:
+    line-through;
+
+  opacity: 0.7;
 }
 
-#money {
+/* MONEY */
+
+#moneyBox {
   position: absolute;
+
   top: 20px;
   right: 20px;
-  background: rgba(13,20,23,.92);
-  color: white;
-  padding: 18px 24px;
-  border-radius: 16px;
+
+  padding: 20px 24px;
+
+  background:
+    rgba(10,16,19,0.88);
+
+  border:
+    1px solid
+    rgba(255,255,255,0.12);
+
+  border-radius: 18px;
+
   font-size: 28px;
+
   font-weight: bold;
 }
 
-#prompt {
-  position: absolute;
-  top: 57%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: rgba(0,0,0,.7);
-  color: white;
-  padding: 10px 18px;
-  border-radius: 10px;
-  font-size: 15px;
-  opacity: 0;
-  transition: opacity .2s;
-}
+/* CROSSHAIR */
 
 #crosshair {
   position: absolute;
-  left: 50%;
+
   top: 50%;
-  transform: translate(-50%, -50%);
-  width: 24px;
-  height: 24px;
+  left: 50%;
+
+  transform:
+    translate(-50%,-50%);
+
+  font-size: 40px;
+
+  font-weight: 200;
+
+  text-shadow:
+    0 2px 5px black;
 }
 
-#crosshair:before,
-#crosshair:after {
-  content: "";
+/* MESSAGE */
+
+#message {
   position: absolute;
-  background: white;
-  box-shadow: 0 0 4px black;
+
+  left: 50%;
+  top: 60%;
+
+  transform:
+    translateX(-50%);
+
+  padding: 15px 25px;
+
+  border-radius: 12px;
+
+  background:
+    rgba(0,0,0,0.7);
+
+  color: white;
+
+  font-size: 17px;
+
+  opacity: 0;
+
+  transition: opacity 0.3s;
+
+  text-align: center;
+
+  max-width: 80%;
 }
 
-#crosshair:before {
-  width: 2px;
-  height: 24px;
-  left: 11px;
-}
+/* =========================
+   CONTROLS
+========================= */
 
-#crosshair:after {
-  width: 24px;
-  height: 2px;
-  top: 11px;
-}
+#joystickArea {
+  position: absolute;
 
-/* ---------- MOBILE CONTROLS ---------- */
+  bottom: 35px;
+  left: 35px;
 
-#controls {
-  position: fixed;
-  inset: 0;
-  z-index: 6;
-  pointer-events: none;
+  width: 150px;
+  height: 150px;
+
+  border-radius: 50%;
+
+  border:
+    3px solid
+    rgba(255,255,255,0.3);
+
+  background:
+    rgba(0,0,0,0.12);
+
+  pointer-events: auto;
 }
 
 #joystick {
-  pointer-events: auto;
   position: absolute;
-  bottom: 45px;
-  left: 35px;
-  width: 145px;
-  height: 145px;
-  border: 3px solid rgba(255,255,255,.32);
+
+  width: 70px;
+  height: 70px;
+
+  left: 40px;
+  top: 40px;
+
   border-radius: 50%;
-  background: rgba(0,0,0,.15);
+
+  background:
+    rgba(220,220,220,0.75);
 }
 
-#stick {
-  position: absolute;
-  width: 65px;
-  height: 65px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.55);
-  left: 37px;
-  top: 37px;
-}
-
-#useBtn {
-  pointer-events: auto;
-  position: absolute;
-  right: 45px;
-  bottom: 65px;
-  width: 145px;
-  height: 145px;
-  border-radius: 50%;
-  border: 4px solid rgba(255,255,255,.65);
-  background: rgba(210,126,35,.92);
-  color: white;
-  font-size: 28px;
-  font-weight: bold;
-  box-shadow: 0 10px 35px rgba(0,0,0,.4);
-}
+/* =========================
+   TOOLBAR
+========================= */
 
 #toolBar {
-  pointer-events: auto;
   position: absolute;
+
   bottom: 25px;
+
   left: 50%;
-  transform: translateX(-50%);
+
+  transform:
+    translateX(-50%);
+
   display: flex;
-  gap: 10px;
+
+  gap: 12px;
+
+  pointer-events: auto;
 }
 
 .tool {
-  min-width: 105px;
-  padding: 13px;
-  background: rgba(13,20,23,.94);
+  min-width: 110px;
+
+  padding: 14px 10px;
+
+  border-radius: 14px;
+
+  border:
+    2px solid
+    rgba(255,255,255,0.12);
+
+  background:
+    rgba(10,16,19,0.92);
+
   color: white;
-  border: 2px solid #2c3b42;
-  border-radius: 10px;
+
   text-align: center;
+
+  font-size: 15px;
+
+  cursor: pointer;
 }
 
 .tool.active {
-  border-color: #e89a38;
-  background: #3a2a18;
+  border-color: #f2a333;
+
+  background:
+    rgba(225,132,25,0.28);
 }
 
-@media (max-width: 700px) {
+/* =========================
+   USE BUTTON
+========================= */
+
+#useBtn {
+  position: absolute;
+
+  right: 35px;
+  bottom: 45px;
+
+  width: 170px;
+  height: 170px;
+
+  border-radius: 50%;
+
+  border:
+    5px solid
+    rgba(255,255,255,0.45);
+
+  background:
+    linear-gradient(
+      135deg,
+      #f0a02d,
+      #c96d12
+    );
+
+  color: white;
+
+  font-size: 28px;
+
+  font-weight: bold;
+
+  pointer-events: auto;
+
+  box-shadow:
+    0 10px 35px
+    rgba(0,0,0,0.4);
+}
+
+#useBtn:active {
+  transform:
+    scale(0.96);
+}
+
+/* =========================
+   COMPLETION
+========================= */
+
+#completeScreen {
+  position: fixed;
+
+  inset: 0;
+
+  z-index: 30;
+
+  display: none;
+
+  align-items: center;
+  justify-content: center;
+
+  background:
+    rgba(0,0,0,0.75);
+}
+
+.completeCard {
+  width: min(85%,500px);
+
+  padding: 45px 30px;
+
+  border-radius: 25px;
+
+  text-align: center;
+
+  background: #121b1f;
+
+  border:
+    1px solid
+    rgba(255,255,255,0.15);
+}
+
+.completeCard h1 {
+  color: #f2a333;
+
+  font-size: 42px;
+}
+
+.reward {
+  font-size: 52px;
+
+  font-weight: bold;
+
+  margin: 25px 0;
+
+  color: #8ee39c;
+}
+
+#restartBtn {
+  padding: 18px 30px;
+
+  border: none;
+
+  border-radius: 12px;
+
+  background: #e68a20;
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: bold;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+
   #jobPanel {
-    width: 46vw;
-    padding: 14px;
+    top: 12px;
+    left: 12px;
+
+    width: 270px;
+
+    padding: 15px;
   }
 
-  #jobPanel h2 {
-    font-size: 19px;
+  #moneyBox {
+    top: 12px;
+    right: 12px;
+
+    font-size: 20px;
+
+    padding: 14px;
   }
 
   .task {
     font-size: 13px;
   }
 
-  #money {
-    font-size: 21px;
+  #joystickArea {
+    width: 120px;
+    height: 120px;
+
+    left: 22px;
+    bottom: 30px;
+  }
+
+  #joystick {
+    width: 56px;
+    height: 56px;
+
+    left: 29px;
+    top: 29px;
   }
 
   #toolBar {
-    bottom: 18px;
+    bottom: 20px;
+
+    gap: 6px;
   }
 
   .tool {
-    min-width: 85px;
-    font-size: 13px;
+    min-width: 76px;
+
+    font-size: 12px;
+
+    padding: 12px 6px;
   }
+
+  #useBtn {
+    width: 130px;
+    height: 130px;
+
+    right: 22px;
+    bottom: 35px;
+
+    font-size: 22px;
+  }
+
 }
+
 </style>
+
 </head>
 
 <body>
 
-<div id="startScreen">
-  <div class="startCard">
-    <h1>KIWI RENOVATOR</h1>
-    <h2>JOB #001 — DAMAGED BEDROOM</h2>
+<!-- START SCREEN -->
 
-    <div class="jobBox">
-      <strong>Property:</strong> Wellington, New Zealand<br><br>
-      <p>
-        An early-2000s bedroom has water damage behind the wall lining.
-        Inspect the damaged area and begin the repair.
-      </p>
+<div id="startScreen">
+
+  <div class="startCard">
+
+    <h1 class="gameTitle">
+      KIWI<br>
+      RENOVATOR
+    </h1>
+
+    <div class="jobTitle">
+      JOB #001 — DAMAGED BEDROOM
     </div>
 
-    <button id="startBtn">START JOB</button>
+    <div class="jobInfo">
+
+      <p>
+        <b>Property:</b>
+        Wellington, New Zealand
+      </p>
+
+      <p>
+        An early-2000s bedroom has
+        water damage behind the wall lining.
+        Inspect the damage, remove the
+        damaged GIB, check the framing,
+        then repair the wall.
+      </p>
+
+    </div>
+
+    <button id="startBtn">
+      START JOB
+    </button>
+
   </div>
+
 </div>
+
+
+<!-- GAME HUD -->
 
 <div id="hud">
 
   <div id="jobPanel">
-    <h2>JOB #001</h2>
 
-    <div class="task" id="task1">☐ Inspect water damage</div>
-    <div class="task" id="task2">☐ Remove damaged GIB</div>
-    <div class="task" id="task3">☐ Inspect timber framing</div>
-    <div class="task" id="task4">☐ Prepare new lining</div>
+    <div class="jobNumber">
+      JOB #001
+    </div>
+
+    <div id="taskList">
+
+      <div
+        class="task"
+        id="task1"
+      >
+        ☐ Inspect damaged wall
+      </div>
+
+      <div
+        class="task"
+        id="task2"
+      >
+        ☐ Remove damaged GIB
+      </div>
+
+      <div
+        class="task"
+        id="task3"
+      >
+        ☐ Inspect timber framing
+      </div>
+
+      <div
+        class="task"
+        id="task4"
+      >
+        ☐ Install new wall lining
+      </div>
+
+    </div>
+
   </div>
 
-  <div id="money">💰 $500</div>
 
-  <div id="crosshair"></div>
-
-  <div id="prompt"></div>
-
-</div>
-
-<div id="controls">
-
-  <div id="joystick">
-    <div id="stick"></div>
+  <div id="moneyBox">
+    💰 $0
   </div>
 
-  <button id="useBtn">USE<br>🔨</button>
+
+  <div id="crosshair">
+    +
+  </div>
+
+
+  <div id="message"></div>
+
+
+  <!-- JOYSTICK -->
+
+  <div id="joystickArea">
+
+    <div id="joystick"></div>
+
+  </div>
+
+
+  <!-- TOOLS -->
 
   <div id="toolBar">
-    <div class="tool active" data-tool="inspect">🔍<br>Inspect</div>
-    <div class="tool" data-tool="hammer">🔨<br>Hammer</div>
-    <div class="tool" data-tool="nailgun">🔫<br>Nail Gun</div>
+
+    <button
+      class="tool active"
+      data-tool="inspect"
+    >
+      🔍<br>
+      Inspect
+    </button>
+
+
+    <button
+      class="tool"
+      data-tool="hammer"
+    >
+      🔨<br>
+      Hammer
+    </button>
+
+
+    <button
+      class="tool"
+      data-tool="nailgun"
+    >
+      🔫<br>
+      Nail Gun
+    </button>
+
+  </div>
+
+
+  <button id="useBtn">
+    USE<br>
+    🔨
+  </button>
+
+</div>
+
+
+<!-- COMPLETION -->
+
+<div id="completeScreen">
+
+  <div class="completeCard">
+
+    <h1>
+      JOB COMPLETE!
+    </h1>
+
+    <p>
+      The damaged bedroom has been
+      successfully repaired.
+    </p>
+
+    <div class="reward">
+      + $850
+    </div>
+
+    <button id="restartBtn">
+      PLAY AGAIN
+    </button>
+
   </div>
 
 </div>
+
+
+<!-- THREE JS -->
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 
+
 <script>
 
-let scene, camera, renderer;
+/* ==========================================
+   GAME VARIABLES
+========================================== */
+
+let scene;
+let camera;
+let renderer;
+
 let yaw = 0;
 let pitch = 0;
 
@@ -348,1309 +790,1120 @@ let moveForward = 0;
 let moveSide = 0;
 
 let joystickActive = false;
-let joyStart = { x: 0, y: 0 };
-
 let lookActive = false;
-let lookStart = { x: 0, y: 0 };
+
+let joystickStart = {
+  x: 0,
+  y: 0
+};
+
+let lookStart = {
+  x: 0,
+  y: 0
+};
 
 let selectedTool = "inspect";
 
 let damageInspected = false;
 let gibRemoved = false;
 let framingInspected = false;
+let wallInstalled = false;
 
-const interactables = [];
+let money = 0;
+
+let damagedWall;
+let replacementWall;
+let framingGroup;
+
 const clock = new THREE.Clock();
 
-init();
+
+/* ==========================================
+   INITIALISE
+========================================== */
 
 function init() {
 
-  scene = new THREE.Scene();
+  scene =
+    new THREE.Scene();
 
-  scene.background = new THREE.Color(0x9baab2);
 
-  scene.fog = new THREE.Fog(0x9baab2, 14, 28);
+  scene.background =
+    new THREE.Color(
+      0x9baab0
+    );
 
-  camera = new THREE.PerspectiveCamera(
-    70,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    100
+
+  scene.fog =
+    new THREE.Fog(
+      0x9baab0,
+      8,
+      30
+    );
+
+
+  camera =
+    new THREE.PerspectiveCamera(
+      70,
+      window.innerWidth /
+      window.innerHeight,
+      0.1,
+      100
+    );
+
+
+  camera.position.set(
+    0,
+    1.7,
+    4.5
   );
 
-  camera.position.set(0, 1.72, 4.5);
 
-  renderer = new THREE.WebGLRenderer({
-    antialias: true
-  });
+  renderer =
+    new THREE.WebGLRenderer({
+      antialias: true
+    });
 
-  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
+
 
   renderer.setPixelRatio(
-    Math.min(window.devicePixelRatio, 2)
+    Math.min(
+      window.devicePixelRatio,
+      2
+    )
   );
+
 
   renderer.shadowMap.enabled = true;
 
   renderer.shadowMap.type =
     THREE.PCFSoftShadowMap;
 
-  renderer.outputColorSpace =
-    THREE.SRGBColorSpace;
 
-  document.body.appendChild(renderer.domElement);
+  document.body.appendChild(
+    renderer.domElement
+  );
+
 
   createRoom();
+
   createFurniture();
+
   createDamagedWall();
+
   createLighting();
+
+  setupControls();
+
+  animate();
+
+}
+
+
+/* ==========================================
+   CREATE ROOM
+========================================== */
+
+function createRoom() {
+
+
+  const roomMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0xd6d1c6,
+      roughness: 0.85
+    });
+
+
+  const floorMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0x8a7968,
+      roughness: 0.9
+    });
+
+
+  /* FLOOR */
+
+  const floor =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        12,
+        12
+      ),
+
+      floorMaterial
+
+    );
+
+
+  floor.rotation.x =
+    -Math.PI / 2;
+
+
+  floor.receiveShadow = true;
+
+
+  scene.add(floor);
+
+
+
+  /* BACK WALL */
+
+  const backWall =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        12,
+        5
+      ),
+
+      roomMaterial
+
+    );
+
+
+  backWall.position.set(
+    0,
+    2.5,
+    -4
+  );
+
+
+  backWall.receiveShadow = true;
+
+
+  scene.add(backWall);
+
+
+
+  /* LEFT WALL */
+
+  const leftWall =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        8,
+        5
+      ),
+
+      roomMaterial
+
+    );
+
+
+  leftWall.rotation.y =
+    Math.PI / 2;
+
+
+  leftWall.position.set(
+    -6,
+    2.5,
+    0
+  );
+
+
+  scene.add(leftWall);
+
+
+
+  /* RIGHT WALL */
+
+  const rightWall =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        8,
+        5
+      ),
+
+      roomMaterial
+
+    );
+
+
+  rightWall.rotation.y =
+    -Math.PI / 2;
+
+
+  rightWall.position.set(
+    6,
+    2.5,
+    0
+  );
+
+
+  scene.add(rightWall);
+
+
+
+  /* CEILING */
+
+  const ceiling =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        12,
+        12
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0xe5e2da
+      })
+
+    );
+
+
+  ceiling.rotation.x =
+    Math.PI / 2;
+
+
+  ceiling.position.y = 5;
+
+
+  scene.add(ceiling);
+
+
+}
+
+
+/* ==========================================
+   FURNITURE
+========================================== */
+
+function createFurniture() {
+
+
+  /* BED */
+
+  const bedFrame =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.5,
+        0.45,
+        3.2
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x3d3028,
+        roughness: 0.8
+      })
+
+    );
+
+
+  bedFrame.position.set(
+    2.6,
+    0.55,
+    -1.5
+  );
+
+
+  bedFrame.castShadow = true;
+
+  bedFrame.receiveShadow = true;
+
+
+  scene.add(bedFrame);
+
+
+
+  /* MATTRESS */
+
+  const mattress =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.35,
+        0.35,
+        3.05
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0xe8e5dc,
+        roughness: 0.9
+      })
+
+    );
+
+
+  mattress.position.set(
+    2.6,
+    0.95,
+    -1.5
+  );
+
+
+  mattress.castShadow = true;
+
+
+  scene.add(mattress);
+
+
+
+  /* PILLOWS */
+
+  for (
+    let i = 0;
+    i < 2;
+    i++
+  ) {
+
+    const pillow =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          0.95,
+          0.18,
+          0.55
+        ),
+
+        new THREE.MeshStandardMaterial({
+          color: 0xf2f0e9
+        })
+
+      );
+
+
+    pillow.position.set(
+      2.15 + i * 0.9,
+      1.22,
+      -2.55
+    );
+
+
+    scene.add(pillow);
+
+  }
+
+
+
+  /* SIDE TABLE */
+
+  const table =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        0.8,
+        0.8,
+        0.7
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x5a4638
+      })
+
+    );
+
+
+  table.position.set(
+    4.3,
+    0.4,
+    -2.2
+  );
+
+
+  table.castShadow = true;
+
+
+  scene.add(table);
+
+
+
+  /* WARDROBE */
+
+  const wardrobe =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        1.8,
+        3.8,
+        0.65
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x55473b
+      })
+
+    );
+
+
+  wardrobe.position.set(
+    -4.8,
+    1.9,
+    -2.7
+  );
+
+
+  wardrobe.castShadow = true;
+
+
+  scene.add(wardrobe);
+
+
+
+  /* WINDOW */
+
+  const windowFrame =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.4,
+        1.7,
+        0.12
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x24282b
+      })
+
+    );
+
+
+  windowFrame.position.set(
+    -2.8,
+    3,
+    -3.92
+  );
+
+
+  scene.add(windowFrame);
+
+
+
+  const glass =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        2.05,
+        1.4
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x7398ad,
+        emissive: 0x18313f,
+        roughness: 0.25
+      })
+
+    );
+
+
+  glass.position.set(
+    -2.8,
+    3,
+    -3.85
+  );
+
+
+  scene.add(glass);
+
+
+}
+
+
+/* ==========================================
+   DAMAGED WALL
+========================================== */
+
+function createDamagedWall() {
+
+
+  /* DAMAGED GIB PANEL */
+
+  damagedWall =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        2.5,
+        2.6
+      ),
+
+      new THREE.MeshStandardMaterial({
+
+        color: 0x8a8175,
+
+        roughness: 1,
+
+        side:
+          THREE.DoubleSide
+
+      })
+
+    );
+
+
+  damagedWall.position.set(
+    0.8,
+    1.8,
+    -3.93
+  );
+
+
+  scene.add(
+    damagedWall
+  );
+
+
+
+  /* WATER DAMAGE PATCHES */
+
+  for (
+    let i = 0;
+    i < 7;
+    i++
+  ) {
+
+    const patch =
+      new THREE.Mesh(
+
+        new THREE.CircleGeometry(
+          0.15 +
+          Math.random() * 0.25,
+          20
+        ),
+
+        new THREE.MeshBasicMaterial({
+
+          color:
+            i % 2 === 0
+              ? 0x5c4939
+              : 0x3d342c,
+
+          transparent: true,
+
+          opacity: 0.65
+
+        })
+
+      );
+
+
+    patch.position.set(
+
+      0.8 +
+      (
+        Math.random() - 0.5
+      ) * 1.8,
+
+      1.8 +
+      (
+        Math.random() - 0.5
+      ) * 1.8,
+
+      -3.91
+
+    );
+
+
+    scene.add(patch);
+
+  }
+
+
+
+  /* FRAMING */
+
+  framingGroup =
+    new THREE.Group();
+
+
+  const timberMaterial =
+    new THREE.MeshStandardMaterial({
+
+      color: 0x9b6a3f,
+
+      roughness: 0.9
+
+    });
+
+
+  for (
+    let i = 0;
+    i < 4;
+    i++
+  ) {
+
+    const stud =
+      new THREE.Mesh(
+
+        new THREE.BoxGeometry(
+          0.12,
+          2.8,
+          0.16
+        ),
+
+        timberMaterial
+
+      );
+
+
+    stud.position.set(
+      -0.2 + i * 0.65,
+      1.8,
+      -3.82
+    );
+
+
+    framingGroup.add(stud);
+
+  }
+
+
+  const topPlate =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.1,
+        0.12,
+        0.16
+      ),
+
+      timberMaterial
+
+    );
+
+
+  topPlate.position.set(
+    0.78,
+    3.15,
+    -3.82
+  );
+
+
+  framingGroup.add(
+    topPlate
+  );
+
+
+  const bottomPlate =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.1,
+        0.12,
+        0.16
+      ),
+
+      timberMaterial
+
+    );
+
+
+  bottomPlate.position.set(
+    0.78,
+    0.45,
+    -3.82
+  );
+
+
+  framingGroup.add(
+    bottomPlate
+  );
+
+
+  framingGroup.visible =
+    false;
+
+
+  scene.add(
+    framingGroup
+  );
+
+
+
+  /* NEW GIB */
+
+  replacementWall =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        2.5,
+        2.6
+      ),
+
+      new THREE.MeshStandardMaterial({
+
+        color: 0xd8d6d0,
+
+        roughness: 0.85
+
+      })
+
+    );
+
+
+  replacementWall.position.set(
+    0.8,
+    1.8,
+    -3.80
+  );
+
+
+  replacementWall.visible =
+    false;
+
+
+  scene.add(
+    replacementWall
+  );
+
+
+}
+
+
+/* ==========================================
+   LIGHTING
+========================================== */
+
+function createLighting() {
+
+
+  /* AMBIENT */
+
+  const ambient =
+    new THREE.HemisphereLight(
+
+      0xdbeeff,
+      0x3c332a,
+      1.8
+
+    );
+
+
+  scene.add(
+    ambient
+  );
+
+
+
+  /* SUNLIGHT */
+
+  const sun =
+    new THREE.DirectionalLight(
+
+      0xffefd5,
+      2.5
+
+    );
+
+
+  sun.position.set(
+    -3,
+    6,
+    2
+  );
+
+
+  sun.castShadow =
+    true;
+
+
+  sun.shadow.mapSize.set(
+    1024,
+    1024
+  );
+
+
+  scene.add(
+    sun
+  );
+
+
+
+  /* WARM ROOM LIGHT */
+
+  const roomLight =
+    new THREE.PointLight(
+
+      0xffc77a,
+      30,
+      8
+
+    );
+
+
+  roomLight.position.set(
+    0,
+    4.3,
+    0
+  );
+
+
+  scene.add(
+    roomLight
+  );
+
+
+}
+
+
+/* ==========================================
+   CONTROLS
+========================================== */
+
+function setupControls() {
+
+
+  const startBtn =
+    document.getElementById(
+      "startBtn"
+    );
+
+
+  startBtn.addEventListener(
+    "click",
+    () => {
+
+      document
+        .getElementById(
+          "startScreen"
+        )
+        .style.display =
+          "none";
+
+
+      showMessage(
+        "Find the damaged wall and inspect it."
+      );
+
+    }
+  );
+
+
+
+  /* TOOL SELECTION */
+
+  document
+    .querySelectorAll(
+      ".tool"
+    )
+    .forEach(
+      tool => {
+
+        tool.addEventListener(
+          "click",
+          () => {
+
+            document
+              .querySelectorAll(
+                ".tool"
+              )
+              .forEach(
+                t =>
+                  t.classList.remove(
+                    "active"
+                  )
+              );
+
+
+            tool.classList.add(
+              "active"
+            );
+
+
+            selectedTool =
+              tool.dataset.tool;
+
+
+            updateUseButton();
+
+          }
+        );
+
+      }
+    );
+
+
+
+  /* USE BUTTON */
+
+  document
+    .getElementById(
+      "useBtn"
+    )
+    .addEventListener(
+      "click",
+      interact
+    );
+
+
+
+  /* RESTART */
+
+  document
+    .getElementById(
+      "restartBtn"
+    )
+    .addEventListener(
+      "click",
+      () => {
+
+        location.reload();
+
+      }
+    );
+
+
+
+  /* LOOK CONTROLS */
+
+  renderer.domElement
+    .addEventListener(
+      "touchstart",
+      startLook,
+      { passive: false }
+    );
+
+
+  renderer.domElement
+    .addEventListener(
+      "touchmove",
+      moveLook,
+      { passive: false }
+    );
+
+
+  renderer.domElement
+    .addEventListener(
+      "touchend",
+      () => {
+
+        lookActive =
+          false;
+
+      }
+    );
+
+
+  /* MOUSE LOOK */
+
+  renderer.domElement
+    .addEventListener(
+      "mousedown",
+      e => {
+
+        lookActive =
+          true;
+
+
+        lookStart.x =
+          e.clientX;
+
+
+        lookStart.y =
+          e.clientY;
+
+      }
+    );
+
+
+  window.addEventListener(
+    "mousemove",
+    e => {
+
+      if (
+        !lookActive
+      )
+        return;
+
+
+      const dx =
+        e.clientX -
+        lookStart.x;
+
+
+      const dy =
+        e.clientY -
+        lookStart.y;
+
+
+      yaw -=
+        dx * 0.005;
+
+
+      pitch -=
+        dy * 0.005;
+
+
+      pitch =
+        Math.max(
+          -1.2,
+          Math.min(
+            1.2,
+            pitch
+          )
+        );
+
+
+      lookStart.x =
+        e.clientX;
+
+
+      lookStart.y =
+        e.clientY;
+
+    }
+  );
+
+
+  window.addEventListener(
+    "mouseup",
+    () => {
+
+      lookActive =
+        false;
+
+    }
+  );
+
+
+
+  /* JOYSTICK */
+
+  const joystickArea =
+    document.getElementById(
+      "joystickArea"
+    );
+
+
+  joystickArea.addEventListener(
+    "touchstart",
+    startJoystick,
+    { passive: false }
+  );
+
+
+  joystickArea.addEventListener(
+    "touchmove",
+    moveJoystick,
+    { passive: false }
+  );
+
+
+  joystickArea.addEventListener(
+    "touchend",
+    endJoystick,
+    { passive: false }
+  );
+
+
+  /* RESIZE */
 
   window.addEventListener(
     "resize",
     onResize
   );
 
-  setupControls();
 
-  animate();
-}
-
-/* ---------------- TEXTURES ---------------- */
-
-function createTextureCanvas(
-  base,
-  variation,
-  size = 256
-) {
-
-  const canvas =
-    document.createElement("canvas");
-
-  canvas.width = size;
-  canvas.height = size;
-
-  const ctx =
-    canvas.getContext("2d");
-
-  ctx.fillStyle = base;
-
-  ctx.fillRect(
-    0,
-    0,
-    size,
-    size
-  );
-
-  for (let i = 0; i < 7000; i++) {
-
-    const x =
-      Math.random() * size;
-
-    const y =
-      Math.random() * size;
-
-    const alpha =
-      Math.random() * .08;
-
-    ctx.fillStyle =
-      `rgba(${variation},${alpha})`;
-
-    ctx.fillRect(
-      x,
-      y,
-      1,
-      1
-    );
-  }
-
-  const texture =
-    new THREE.CanvasTexture(canvas);
-
-  texture.wrapS =
-    THREE.RepeatWrapping;
-
-  texture.wrapT =
-    THREE.RepeatWrapping;
-
-  texture.repeat.set(4, 4);
-
-  return texture;
-}
-
-const wallTexture =
-  createTextureCanvas(
-    "#d4d0c8",
-    "90,85,80"
-  );
-
-const carpetTexture =
-  createTextureCanvas(
-    "#6c655b",
-    "30,25,20"
-  );
-
-const timberTexture =
-  createTextureCanvas(
-    "#a97845",
-    "80,50,20"
-  );
-
-/* ---------------- ROOM ---------------- */
-
-function createRoom() {
-
-  const floorMat =
-    new THREE.MeshStandardMaterial({
-      map: carpetTexture,
-      roughness: 1
-    });
-
-  const floor =
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        12,
-        10
-      ),
-      floorMat
-    );
-
-  floor.rotation.x =
-    -Math.PI / 2;
-
-  floor.receiveShadow = true;
-
-  scene.add(floor);
-
-  const ceilingMat =
-    new THREE.MeshStandardMaterial({
-      color: 0xf2f0eb,
-      roughness: .9
-    });
-
-  const ceiling =
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        12,
-        10
-      ),
-      ceilingMat
-    );
-
-  ceiling.position.y = 2.7;
-
-  ceiling.rotation.x =
-    Math.PI / 2;
-
-  scene.add(ceiling);
-
-  const wallMat =
-    new THREE.MeshStandardMaterial({
-      map: wallTexture,
-      roughness: .95
-    });
-
-  /* BACK WALL */
-
-  createWall(
-    12,
-    2.7,
-    .15,
-    0,
-    1.35,
-    -5,
-    wallMat
-  );
-
-  /* LEFT WALL */
-
-  createWall(
-    .15,
-    2.7,
-    10,
-    -6,
-    1.35,
-    0,
-    wallMat
-  );
-
-  /* RIGHT WALL */
-
-  createWall(
-    .15,
-    2.7,
-    10,
-    6,
-    1.35,
-    0,
-    wallMat
-  );
-
-  /* SKIRTING */
-
-  const skirtMat =
-    new THREE.MeshStandardMaterial({
-      color: 0xf0eee9,
-      roughness: .75
-    });
-
-  createBox(
-    12,
-    .12,
-    .12,
-    0,
-    .06,
-    -4.92,
-    skirtMat
-  );
-
-  createBox(
-    .12,
-    .12,
-    10,
-    -5.92,
-    .06,
-    0,
-    skirtMat
-  );
-
-  createBox(
-    .12,
-    .12,
-    10,
-    5.92,
-    .06,
-    0,
-    skirtMat
-  );
-
-  createWindow();
-
-  createDoor();
-}
-
-function createWall(
-  width,
-  height,
-  depth,
-  x,
-  y,
-  z,
-  material
-) {
-
-  const wall =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        width,
-        height,
-        depth
-      ),
-      material
-    );
-
-  wall.position.set(
-    x,
-    y,
-    z
-  );
-
-  wall.receiveShadow = true;
-
-  scene.add(wall);
-
-  return wall;
-}
-
-function createBox(
-  width,
-  height,
-  depth,
-  x,
-  y,
-  z,
-  material
-) {
-
-  const mesh =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        width,
-        height,
-        depth
-      ),
-      material
-    );
-
-  mesh.position.set(
-    x,
-    y,
-    z
-  );
-
-  mesh.castShadow = true;
-  mesh.receiveShadow = true;
-
-  scene.add(mesh);
-
-  return mesh;
-}
-
-/* ---------------- WINDOW ---------------- */
-
-function createWindow() {
-
-  const frameMat =
-    new THREE.MeshStandardMaterial({
-      color: 0xf5f5f2,
-      roughness: .55
-    });
-
-  const glassMat =
-    new THREE.MeshStandardMaterial({
-      color: 0x9dc7dc,
-      roughness: .15,
-      metalness: .05,
-      transparent: true,
-      opacity: .75
-    });
-
-  const x = 5.88;
-
-  createBox(
-    .12,
-    1.5,
-    2.3,
-    x,
-    1.65,
-    -1.4,
-    frameMat
-  );
-
-  const glass =
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        2.05,
-        1.25
-      ),
-      glassMat
-    );
-
-  glass.rotation.y =
-    -Math.PI / 2;
-
-  glass.position.set(
-    5.78,
-    1.7,
-    -1.4
-  );
-
-  scene.add(glass);
-
-  /* Window mullion */
-
-  createBox(
-    .08,
-    1.3,
-    .08,
-    5.7,
-    1.7,
-    -1.4,
-    frameMat
-  );
-}
-
-/* ---------------- DOOR ---------------- */
-
-function createDoor() {
-
-  const doorMat =
-    new THREE.MeshStandardMaterial({
-      color: 0x795d45,
-      roughness: .75
-    });
-
-  const door =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        1.6,
-        2.35,
-        .08
-      ),
-      doorMat
-    );
-
-  door.position.set(
-    -5.85,
-    1.18,
-    2.7
-  );
-
-  scene.add(door);
-
-  const handle =
-    new THREE.Mesh(
-      new THREE.SphereGeometry(
-        .07,
-        12,
-        12
-      ),
-      new THREE.MeshStandardMaterial({
-        color: 0xc9c1ae,
-        metalness: .7,
-        roughness: .3
-      })
-    );
-
-  handle.position.set(
-    -5.72,
-    1.15,
-    2.2
-  );
-
-  scene.add(handle);
-}
-
-/* ---------------- DAMAGED WALL ---------------- */
-
-function createDamagedWall() {
-
-  const damagedGroup =
-    new THREE.Group();
-
-  damagedGroup.position.set(
-    -2.2,
-    1.35,
-    -4.87
-  );
-
-  scene.add(damagedGroup);
-
-  /* Remaining GIB */
-
-  const gibMat =
-    new THREE.MeshStandardMaterial({
-      color: 0xd6d2ca,
-      roughness: .9
-    });
-
-  const topGib =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        3.8,
-        .65,
-        .08
-      ),
-      gibMat
-    );
-
-  topGib.position.y = .95;
-
-  damagedGroup.add(topGib);
-
-  const leftGib =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .7,
-        1.25,
-        .08
-      ),
-      gibMat
-    );
-
-  leftGib.position.set(
-    -1.55,
-    -.35,
-    0
-  );
-
-  damagedGroup.add(leftGib);
-
-  const rightGib =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        .6,
-        1.25,
-        .08
-      ),
-      gibMat
-    );
-
-  rightGib.position.set(
-      1.6,
-      -.35,
-      0
-  );
-
-  damagedGroup.add(rightGib);
-
-  /* DAMAGED SECTION */
-
-  const damagedMat =
-    new THREE.MeshStandardMaterial({
-      color: 0x554b42,
-      roughness: 1
-    });
-
-  const damage =
-    new THREE.Mesh(
-      new THREE.PlaneGeometry(
-        2.8,
-        1.8
-      ),
-      damagedMat
-    );
-
-  damage.position.set(
-    0,
-    -.25,
-    -.05
-  );
-
-  damage.userData.type =
-    "damage";
-
-  damagedGroup.add(damage);
-
-  interactables.push(damage);
-
-  /* Water stain */
-
-  const stain =
-    new THREE.Mesh(
-      new THREE.CircleGeometry(
-        .55,
-        32
-      ),
-      new THREE.MeshBasicMaterial({
-        color: 0x302821,
-        transparent: true,
-        opacity: .65
-      })
-    );
-
-  stain.scale.y = 1.6;
-
-  stain.position.set(
-    -.4,
-    .1,
-    -.06
-  );
-
-  damagedGroup.add(stain);
-
-  /* FRAMING */
-
-  const timberMat =
-    new THREE.MeshStandardMaterial({
-      map: timberTexture,
-      roughness: .85
-    });
-
-  const studs = [
-    -1.15,
-    0,
-    1.15
-  ];
-
-  studs.forEach(x => {
-
-    const stud =
-      new THREE.Mesh(
-        new THREE.BoxGeometry(
-          .14,
-          2.1,
-          .12
-        ),
-        timberMat
-      );
-
-    stud.position.set(
-      x,
-      -.25,
-      -.13
-    );
-
-    stud.visible = false;
-
-    stud.userData.type =
-      "framing";
-
-    damagedGroup.add(stud);
-
-    interactables.push(stud);
-  });
-
-  const nog =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.55,
-        .12,
-        .12
-      ),
-      timberMat
-    );
-
-  nog.position.set(
-    0,
-    -.25,
-    -.13
-  );
-
-  nog.visible = false;
-
-  damagedGroup.add(nog);
-
-  interactables.push(nog);
-
-  damage.userData.framing =
-    damagedGroup;
-}
-
-/* ---------------- FURNITURE ---------------- */
-
-function createFurniture() {
-
-  createBed();
-  createDesk();
-  createToolBox();
-}
-
-function createBed() {
-
-  const baseMat =
-    new THREE.MeshStandardMaterial({
-      color: 0x303335,
-      roughness: .8
-    });
-
-  const mattressMat =
-    new THREE.MeshStandardMaterial({
-      color: 0xe4e1d9,
-      roughness: .9
-    });
-
-  createBox(
-    2.4,
-    .45,
-    1.8,
-    2.7,
-    .48,
-    1.3,
-    baseMat
-  );
-
-  createBox(
-    2.35,
-    .35,
-    1.75,
-    2.7,
-    .87,
-    1.3,
-    mattressMat
-  );
-
-  const blanket =
-    new THREE.Mesh(
-      new THREE.BoxGeometry(
-        2.25,
-        .08,
-        1
-      ),
-      new THREE.MeshStandardMaterial({
-        color: 0x61717c,
-        roughness: .85
-      })
-    );
-
-  blanket.position.set(
-    2.7,
-    1.08,
-    1.7
-  );
-
-  scene.add(blanket);
-}
-
-function createDesk() {
-
-  const wood =
-    new THREE.MeshStandardMaterial({
-      color: 0x7b583c,
-      roughness: .75
-    });
-
-  createBox(
-    1.8,
-    .1,
-    .8,
-    -3.5,
-    1.15,
-    2.5,
-    wood
-  );
-
-  for (
-    let x of [-4.2, -2.8]
-  ) {
-    for (
-      let z of [2.2, 2.8]
-    ) {
-
-      createBox(
-        .1,
-        1.1,
-        .1,
-        x,
-        .55,
-        z,
-        wood
-      );
-    }
-  }
-}
-
-function createToolBox() {
-
-  const box =
-    createBox(
-      1,
-      .45,
-      .5,
-      -1,
-      .25,
-      2.5,
-      new THREE.MeshStandardMaterial({
-        color: 0xa81717,
-        roughness: .65
-      })
-    );
-
-  box.userData.type =
-    "toolbox";
-
-  interactables.push(box);
-}
-
-/* ---------------- LIGHTING ---------------- */
-
-function createLighting() {
-
-  const hemi =
-    new THREE.HemisphereLight(
-      0xb8d7e5,
-      0x4b3e30,
-      1.5
-    );
-
-  scene.add(hemi);
-
-  const sunlight =
-    new THREE.DirectionalLight(
-      0xfff4dd,
-      2.2
-    );
-
-  sunlight.position.set(
-    3,
-    6,
-    2
-  );
-
-  sunlight.castShadow = true;
-
-  sunlight.shadow.mapSize.set(
-    2048,
-    2048
-  );
-
-  sunlight.shadow.camera.left = -10;
-  sunlight.shadow.camera.right = 10;
-  sunlight.shadow.camera.top = 10;
-  sunlight.shadow.camera.bottom = -10;
-
-  scene.add(sunlight);
-
-  /* Ceiling light */
-
-  const ceilingLight =
-    new THREE.PointLight(
-      0xffe5bd,
-      25,
-      12,
-      2
-    );
-
-  ceilingLight.position.set(
-    0,
-    2.45,
-    0
-  );
-
-  ceilingLight.castShadow = true;
-
-  scene.add(ceilingLight);
-
-  const fitting =
-    new THREE.Mesh(
-      new THREE.CylinderGeometry(
-        .22,
-        .28,
-        .12,
-        24
-      ),
-      new THREE.MeshStandardMaterial({
-        color: 0xf5efe3,
-        roughness: .5
-      })
-    );
-
-  fitting.position.set(
-    0,
-    2.58,
-    0
-  );
-
-  scene.add(fitting);
-}
-
-/* ---------------- INTERACTION ---------------- */
-
-function checkInteraction() {
-
-  const raycaster =
-    new THREE.Raycaster();
-
-  raycaster.setFromCamera(
-    new THREE.Vector2(0, 0),
-    camera
-  );
-
-  const hits =
-    raycaster.intersectObjects(
-      interactables,
-      true
-    );
-
-  const prompt =
-    document.getElementById("prompt");
-
-  if (
-    hits.length > 0 &&
-    hits[0].distance < 3.5
-  ) {
-
-    const object =
-      hits[0].object;
-
-    if (
-      object.userData.type === "damage"
-    ) {
-
-      prompt.style.opacity = 1;
-
-      if (!damageInspected) {
-        prompt.innerHTML =
-          "Damaged GIB — inspect the water damage";
-      } else {
-        prompt.innerHTML =
-          "Damaged GIB — remove lining";
-      }
-
-      return object;
-    }
-
-    if (
-      object.userData.type === "framing"
-    ) {
-
-      prompt.style.opacity = 1;
-
-      prompt.innerHTML =
-        "Timber framing — inspect";
-
-      return object;
-    }
-  }
-
-  prompt.style.opacity = 0;
-
-  return null;
-}
-
-function interact() {
-
-  const object =
-    checkInteraction();
-
-  if (!object) return;
-
-  if (
-    object.userData.type === "damage"
-  ) {
-
-    if (
-      selectedTool === "inspect" &&
-      !damageInspected
-    ) {
-
-      damageInspected = true;
-
-      completeTask(
-        "task1"
-      );
-
-      showMessage(
-        "Water damage found. The GIB needs removing."
-      );
-
-      return;
-    }
-
-    if (
-      selectedTool === "hammer" &&
-      damageInspected &&
-      !gibRemoved
-    ) {
-
-      gibRemoved = true;
-
-      object.visible = false;
-
-      const group =
-        object.parent;
-
-      group.children.forEach(
-        child => {
-
-          if (
-            child.userData.type ===
-            "framing"
-          ) {
-
-            child.visible = true;
-          }
-        }
-      );
-
-      completeTask(
-        "task2"
-      );
-
-      showMessage(
-        "Damaged GIB removed. Inspect the framing."
-      );
-
-      return;
-    }
-  }
-
-  if (
-    object.userData.type ===
-    "framing"
-  ) {
-
-    if (
-      selectedTool === "inspect" &&
-      gibRemoved &&
-      !framingInspected
-    ) {
-
-      framingInspected = true;
-
-      completeTask(
-        "task3"
-      );
-
-      showMessage(
-        "Framing looks structurally sound."
-      );
-    }
-  }
-}
-
-/* ---------------- TASKS ---------------- */
-
-function completeTask(id) {
-
-  const task =
-    document.getElementById(id);
-
-  task.classList.add("done");
-
-  task.innerHTML =
-    "☑ " +
-    task.innerText
-      .replace("☐ ", "")
-      .replace("☑ ", "");
-
-  let money =
-    document.getElementById("money");
-
-  let current =
-    Number(
-      money.innerText
-        .replace(/[^0-9]/g, "")
-    );
-
-  current += 50;
-
-  money.innerHTML =
-    "💰 $" + current;
-}
-
-function showMessage(text) {
-
-  const prompt =
-    document.getElementById("prompt");
-
-  prompt.innerHTML = text;
-
-  prompt.style.opacity = 1;
-
-  setTimeout(() => {
-
-    prompt.style.opacity = 0;
-
-  }, 3000);
-}
-
-/* ---------------- CONTROLS ---------------- */
-
-function setupControls() {
-
-  document
-    .getElementById("startBtn")
-    .addEventListener(
-      "click",
-      () => {
-
-        document
-          .getElementById(
-            "startScreen"
-          )
-          .style.display = "none";
-
-      }
-    );
-
-  /* TOOL SELECTION */
-
-  document
-    .querySelectorAll(".tool")
-    .forEach(tool => {
-
-      tool.addEventListener(
-        "click",
-        () => {
-
-          document
-            .querySelectorAll(".tool")
-            .forEach(
-              t =>
-                t.classList.remove(
-                  "active"
-                )
-            );
-
-          tool.classList.add(
-            "active"
-          );
-
-          selectedTool =
-            tool.dataset.tool;
-        }
-      );
-    });
-
-  document
-    .getElementById("useBtn")
-    .addEventListener(
-      "click",
-      interact
-    );
-
-  /* JOYSTICK */
-
-  const joystick =
-    document.getElementById(
-      "joystick"
-    );
-
-  const stick =
-    document.getElementById(
-      "stick"
-    );
-
-  joystick.addEventListener(
-    "touchstart",
-    e => {
-
-      joystickActive = true;
-
-      const touch =
-        e.touches[0];
-
-      const rect =
-        joystick.getBoundingClientRect();
-
-      joyStart.x =
-        rect.left +
-        rect.width / 2;
-
-      joyStart.y =
-        rect.top +
-        rect.height / 2;
-
-      e.preventDefault();
-    }
-  );
-
-  joystick.addEventListener(
-    "touchmove",
-    e => {
-
-      if (!joystickActive) return;
-
-      const touch =
-        e.touches[0];
-
-      let dx =
-        touch.clientX -
-        joyStart.x;
-
-      let dy =
-        touch.clientY -
-        joyStart.y;
-
-      const max = 40;
-
-      const length =
-        Math.sqrt(
-          dx * dx +
-          dy * dy
-        );
-
-      if (length > max) {
-
-        dx =
-          dx / length * max;
-
-        dy =
-          dy / length * max;
-      }
-
-      stick.style.transform =
-        `translate(${dx}px, ${dy}px)`;
-
-      moveSide =
-        dx / max;
-
-      moveForward =
-        -dy / max;
-
-      e.preventDefault();
-    }
-  );
-
-  function resetJoystick() {
-
-    joystickActive = false;
-
-    moveForward = 0;
-    moveSide = 0;
-
-    stick.style.transform =
-      "translate(0,0)";
-  }
-
-  joystick.addEventListener(
-    "touchend",
-    resetJoystick
-  );
-
-  joystick.addEventListener(
-    "touchcancel",
-    resetJoystick
-  );
-
-  /* LOOK CONTROLS */
-
-  renderer.domElement.addEventListener(
-    "touchstart",
-    e => {
-
-      const touch =
-        e.touches[0];
-
-      if (
-        touch.clientX >
-        window.innerWidth * .42
-      ) {
-
-        lookActive = true;
-
-        lookStart.x =
-          touch.clientX;
-
-        lookStart.y =
-          touch.clientY;
-      }
-
-    }
-  );
-
-  renderer.domElement.addEventListener(
-    "touchmove",
-    e => {
-
-      if (!lookActive) return;
-
-      const touch =
-        e.touches[0];
-
-      const dx =
-        touch.clientX -
-        lookStart.x;
-
-      const dy =
-        touch.clientY -
-        lookStart.y;
-
-      yaw -= dx * .008;
-
-      pitch -= dy * .008;
-
-      pitch =
-        Math.max(
-          -1.3,
-          Math.min(
-            1.3,
-            pitch
-          )
-        );
-
-      lookStart.x =
-        touch.clientX;
-
-      lookStart.y =
-        touch.clientY;
-
-    }
-  );
-
-  renderer.domElement.addEventListener(
-    "touchend",
-    () => {
-
-      lookActive = false;
-
-    }
-  );
-
-  /* KEYBOARD FOR DESKTOP */
+  /* KEYBOARD */
 
   const keys = {};
+
 
   window.addEventListener(
     "keydown",
@@ -1663,6 +1916,7 @@ function setupControls() {
     }
   );
 
+
   window.addEventListener(
     "keyup",
     e => {
@@ -1674,58 +1928,722 @@ function setupControls() {
     }
   );
 
-  setInterval(() => {
 
-    if (keys.w)
-      moveForward = 1;
+  setInterval(
+    () => {
 
-    if (keys.s)
-      moveForward = -1;
+      if (
+        keys.w
+      )
+        moveForward =
+          1;
 
-    if (!keys.w && !keys.s)
-      moveForward = 0;
 
-    if (keys.a)
-      moveSide = -1;
+      else if (
+        keys.s
+      )
+        moveForward =
+          -1;
 
-    if (keys.d)
-      moveSide = 1;
 
-    if (!keys.a && !keys.d)
-      moveSide = 0;
+      else
+        moveForward =
+          0;
 
-  }, 20);
+
+      if (
+        keys.d
+      )
+        moveSide =
+          1;
+
+
+      else if (
+        keys.a
+      )
+        moveSide =
+          -1;
+
+
+      else
+        moveSide =
+          0;
+
+    },
+    16
+  );
+
+
 }
 
-/* ---------------- GAME LOOP ---------------- */
+
+/* ==========================================
+   UPDATE USE BUTTON
+========================================== */
+
+function updateUseButton() {
+
+
+  const btn =
+    document.getElementById(
+      "useBtn"
+    );
+
+
+  if (
+    selectedTool ===
+    "inspect"
+  ) {
+
+    btn.innerHTML =
+      "USE<br>🔍";
+
+  }
+
+
+  if (
+    selectedTool ===
+    "hammer"
+  ) {
+
+    btn.innerHTML =
+      "USE<br>🔨";
+
+  }
+
+
+  if (
+    selectedTool ===
+    "nailgun"
+  ) {
+
+    btn.innerHTML =
+      "USE<br>🔫";
+
+  }
+
+
+}
+
+
+/* ==========================================
+   JOYSTICK
+========================================== */
+
+function startJoystick(
+  e
+) {
+
+  e.preventDefault();
+
+
+  joystickActive =
+    true;
+
+
+  const touch =
+    e.touches[0];
+
+
+  joystickStart.x =
+    touch.clientX;
+
+
+  joystickStart.y =
+    touch.clientY;
+
+}
+
+
+function moveJoystick(
+  e
+) {
+
+  if (
+    !joystickActive
+  )
+    return;
+
+
+  e.preventDefault();
+
+
+  const touch =
+    e.touches[0];
+
+
+  let dx =
+    touch.clientX -
+    joystickStart.x;
+
+
+  let dy =
+    touch.clientY -
+    joystickStart.y;
+
+
+  const distance =
+    Math.sqrt(
+      dx * dx +
+      dy * dy
+    );
+
+
+  const max =
+    40;
+
+
+  if (
+    distance >
+    max
+  ) {
+
+    dx =
+      dx /
+      distance *
+      max;
+
+
+    dy =
+      dy /
+      distance *
+      max;
+
+  }
+
+
+  const joystick =
+    document.getElementById(
+      "joystick"
+    );
+
+
+  joystick.style.transform =
+    `translate(${dx}px, ${dy}px)`;
+
+
+  moveSide =
+    dx / max;
+
+
+  moveForward =
+    -dy / max;
+
+}
+
+
+function endJoystick() {
+
+
+  joystickActive =
+    false;
+
+
+  moveForward =
+    0;
+
+
+  moveSide =
+    0;
+
+
+  document
+    .getElementById(
+      "joystick"
+    )
+    .style.transform =
+      "translate(0px,0px)";
+
+}
+
+
+/* ==========================================
+   LOOK
+========================================== */
+
+function startLook(
+  e
+) {
+
+
+  if (
+    joystickActive
+  )
+    return;
+
+
+  if (
+    e.touches.length !== 1
+  )
+    return;
+
+
+  lookActive =
+    true;
+
+
+  lookStart.x =
+    e.touches[0].clientX;
+
+
+  lookStart.y =
+    e.touches[0].clientY;
+
+}
+
+
+function moveLook(
+  e
+) {
+
+
+  if (
+    !lookActive
+  )
+    return;
+
+
+  const touch =
+    e.touches[0];
+
+
+  const dx =
+    touch.clientX -
+    lookStart.x;
+
+
+  const dy =
+    touch.clientY -
+    lookStart.y;
+
+
+  yaw -=
+    dx * 0.006;
+
+
+  pitch -=
+    dy * 0.006;
+
+
+  pitch =
+    Math.max(
+      -1.2,
+      Math.min(
+        1.2,
+        pitch
+      )
+    );
+
+
+  lookStart.x =
+    touch.clientX;
+
+
+  lookStart.y =
+    touch.clientY;
+
+}
+
+
+/* ==========================================
+   INTERACTION
+========================================== */
+
+function interact() {
+
+
+  const distance =
+    camera.position.distanceTo(
+      new THREE.Vector3(
+        0.8,
+        1.8,
+        -3.8
+      )
+    );
+
+
+  if (
+    distance > 4
+  ) {
+
+    showMessage(
+      "Move closer to the damaged wall."
+    );
+
+    return;
+
+  }
+
+
+
+  /* STEP 1 */
+
+  if (
+    !damageInspected
+  ) {
+
+
+    if (
+      selectedTool !==
+      "inspect"
+    ) {
+
+      showMessage(
+        "Select the Inspect tool."
+      );
+
+      return;
+
+    }
+
+
+    damageInspected =
+      true;
+
+
+    completeTask(
+      "task1"
+    );
+
+
+    showMessage(
+      "Water damage found behind the GIB. Remove the damaged lining."
+    );
+
+
+    return;
+
+  }
+
+
+
+  /* STEP 2 */
+
+  if (
+    damageInspected &&
+    !gibRemoved
+  ) {
+
+
+    if (
+      selectedTool !==
+      "hammer"
+    ) {
+
+      showMessage(
+        "Use the Hammer to remove the damaged GIB."
+      );
+
+      return;
+
+    }
+
+
+    gibRemoved =
+      true;
+
+
+    damagedWall.visible =
+      false;
+
+
+    framingGroup.visible =
+      true;
+
+
+    completeTask(
+      "task2"
+    );
+
+
+    showMessage(
+      "Damaged GIB removed. Inspect the timber framing."
+    );
+
+
+    return;
+
+  }
+
+
+
+  /* STEP 3 */
+
+  if (
+    gibRemoved &&
+    !framingInspected
+  ) {
+
+
+    if (
+      selectedTool !==
+      "inspect"
+    ) {
+
+      showMessage(
+        "Select Inspect and check the timber framing."
+      );
+
+      return;
+
+    }
+
+
+    framingInspected =
+      true;
+
+
+    completeTask(
+      "task3"
+    );
+
+
+    showMessage(
+      "Framing looks good. Install the new wall lining."
+    );
+
+
+    return;
+
+  }
+
+
+
+  /* STEP 4 */
+
+  if (
+    framingInspected &&
+    !wallInstalled
+  ) {
+
+
+    if (
+      selectedTool !==
+      "nailgun"
+    ) {
+
+      showMessage(
+        "Use the Nail Gun to install the new lining."
+      );
+
+      return;
+
+    }
+
+
+    wallInstalled =
+      true;
+
+
+    framingGroup.visible =
+      false;
+
+
+    replacementWall.visible =
+      true;
+
+
+    completeTask(
+      "task4"
+    );
+
+
+    addMoney(
+      850
+    );
+
+
+    showMessage(
+      "Wall lining installed!"
+    );
+
+
+    setTimeout(
+      completeJob,
+      1500
+    );
+
+
+    return;
+
+  }
+
+
+}
+
+
+/* ==========================================
+   COMPLETE TASK
+========================================== */
+
+function completeTask(
+  id
+) {
+
+
+  const task =
+    document.getElementById(
+      id
+    );
+
+
+  task.classList.add(
+    "done"
+  );
+
+
+  task.innerHTML =
+    task.innerHTML.replace(
+      "☐",
+      "☑"
+    );
+
+}
+
+
+/* ==========================================
+   MONEY
+========================================== */
+
+function addMoney(
+  amount
+) {
+
+
+  money +=
+    amount;
+
+
+  document
+    .getElementById(
+      "moneyBox"
+    )
+    .innerHTML =
+      "💰 $" + money;
+
+}
+
+
+/* ==========================================
+   COMPLETE JOB
+========================================== */
+
+function completeJob() {
+
+
+  document
+    .getElementById(
+      "completeScreen"
+    )
+    .style.display =
+      "flex";
+
+}
+
+
+/* ==========================================
+   MESSAGE
+========================================== */
+
+let messageTimeout;
+
+
+function showMessage(
+  text
+) {
+
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+
+  message.innerHTML =
+    text;
+
+
+  message.style.opacity =
+    1;
+
+
+  clearTimeout(
+    messageTimeout
+  );
+
+
+  messageTimeout =
+    setTimeout(
+      () => {
+
+        message.style.opacity =
+          0;
+
+      },
+      3500
+    );
+
+}
+
+
+/* ==========================================
+   RESIZE
+========================================== */
+
+function onResize() {
+
+
+  camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
+
+
+  camera.updateProjectionMatrix();
+
+
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
+
+}
+
+
+/* ==========================================
+   GAME LOOP
+========================================== */
 
 function animate() {
+
 
   requestAnimationFrame(
     animate
   );
 
-  const delta =
-    Math.min(
-      clock.getDelta(),
-      .05
-    );
 
-  const speed = 2.2;
+  const delta =
+    clock.getDelta();
+
+
+  const speed =
+    3;
+
 
   const forward =
     new THREE.Vector3(
       Math.sin(yaw),
       0,
-      -Math.cos(yaw)
+      Math.cos(yaw)
     );
+
 
   const right =
     new THREE.Vector3(
       Math.cos(yaw),
       0,
-      Math.sin(yaw)
+      -Math.sin(yaw)
     );
+
 
   camera.position.addScaledVector(
     forward,
@@ -1734,12 +2652,14 @@ function animate() {
     delta
   );
 
+
   camera.position.addScaledVector(
     right,
     moveSide *
     speed *
     delta
   );
+
 
   /* ROOM BOUNDARIES */
 
@@ -1752,43 +2672,43 @@ function animate() {
       )
     );
 
+
   camera.position.z =
     Math.max(
-      -4.5,
+      -3.5,
       Math.min(
-        4.5,
+        5.5,
         camera.position.z
       )
     );
 
+
   camera.rotation.order =
     "YXZ";
 
-  camera.rotation.y = yaw;
 
-  camera.rotation.x = pitch;
+  camera.rotation.y =
+    yaw;
 
-  checkInteraction();
+
+  camera.rotation.x =
+    pitch;
+
 
   renderer.render(
     scene,
     camera
   );
+
+
 }
 
-function onResize() {
 
-  camera.aspect =
-    window.innerWidth /
-    window.innerHeight;
+/* ==========================================
+   START GAME
+========================================== */
 
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(
-    window.innerWidth,
-    window.innerHeight
-  );
-}
+init();
 
 </script>
 
