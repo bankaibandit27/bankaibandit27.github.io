@@ -1,396 +1,394 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-
 <title>Kiwi Renovator</title>
 
 <style>
-* {
-  box-sizing: border-box;
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#101214;
+  font-family:Arial,Helvetica,sans-serif;
+  touch-action:none;
 }
 
-html,
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #111;
-  font-family: Arial, sans-serif;
-  color: #fff;
+canvas{
+  position:fixed;
+  inset:0;
+  width:100%;
+  height:100%;
+  display:block;
 }
 
-canvas {
-  position: fixed;
-  inset: 0;
+#hud{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  color:#f4f4f4;
 }
 
-#ui {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-  pointer-events: none;
+#panel{
+  position:absolute;
+  left:18px;
+  top:28px;
+  width:min(430px,52vw);
+  padding:22px;
+  border-radius:22px;
+  background:rgba(9,14,17,.88);
+  border:1px solid rgba(255,255,255,.13);
 }
 
-.panel {
-  background: #0b1216e8;
-  border: 1px solid #344047;
-  border-radius: 24px;
+#title{
+  font-size:30px;
+  font-weight:800;
+  color:#ffad38;
+  margin-bottom:18px;
 }
 
-#job {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  padding: 20px;
-  width: min(470px, 62vw);
+.task{
+  font-size:16px;
+  margin:15px 0;
 }
 
-h1 {
-  margin: 0 0 14px;
-  color: #ffad3d;
-  font-size: 34px;
+.done{
+  text-decoration:line-through;
+  color:#82cf91;
 }
 
-.task {
-  margin: 15px 0;
-  font-size: 19px;
+#money{
+  position:absolute;
+  right:18px;
+  top:28px;
+  padding:18px 23px;
+  border-radius:20px;
+  background:rgba(9,14,17,.9);
+  border:1px solid rgba(255,255,255,.13);
+  font-size:26px;
+  font-weight:800;
 }
 
-.done {
-  color: #88d89d;
-  text-decoration: line-through;
+#cross{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  font-size:42px;
+  text-shadow:0 1px 4px #000;
 }
 
-#cash {
-  position: absolute;
-  right: 18px;
-  top: 18px;
-  padding: 22px;
-  font-size: 30px;
-  font-weight: bold;
+#controls{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:18px;
+  height:190px;
+  pointer-events:auto;
 }
 
-.cross {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  font-size: 42px;
-  transform: translate(-50%, -50%);
+#joy{
+  position:absolute;
+  left:28px;
+  bottom:8px;
+  width:130px;
+  height:130px;
+  border:3px solid #aaa;
+  border-radius:50%;
+  background:#1116;
 }
 
-#joy {
-  position: absolute;
-  bottom: 30px;
-  left: 30px;
-  width: 130px;
-  height: 130px;
-  border: 3px solid #aaa;
-  border-radius: 50%;
-  pointer-events: auto;
-  touch-action: none;
+#knob{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:58px;
+  height:58px;
+  border-radius:50%;
+  background:#ddd;
+  transform:translate(-50%,-50%);
 }
 
-#stick {
-  position: absolute;
-  width: 62px;
-  height: 62px;
-  left: 31px;
-  top: 31px;
-  background: #ddd;
-  border-radius: 50%;
+#tools{
+  position:absolute;
+  left:50%;
+  bottom:5px;
+  transform:translateX(-50%);
+  display:flex;
+  gap:9px;
 }
 
-#tools {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 8px;
-  pointer-events: auto;
+.tool{
+  width:95px;
+  min-height:62px;
+  border-radius:14px;
+  border:1px solid #394149;
+  background:#101519;
+  color:#eee;
+  font-size:14px;
 }
 
-.tool {
-  width: 100px;
-  height: 70px;
-  background: #10181b;
-  color: #eee;
-  border: 2px solid #344047;
-  border-radius: 15px;
-  font-size: 15px;
+.tool.active{
+  border:3px solid #f39a27;
+  background:#392817;
 }
 
-.active {
-  border-color: #f3a333;
+#use{
+  position:absolute;
+  right:28px;
+  bottom:2px;
+  width:140px;
+  height:140px;
+  border-radius:50%;
+  border:5px solid #ffe0b2;
+  background:#e78918;
+  color:#fff;
+  font-size:28px;
+  font-weight:800;
 }
 
-#use {
-  position: absolute;
-  right: 24px;
-  bottom: 24px;
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  border: 4px solid #ffe0b0;
-  background: #e98a10;
-  color: #fff;
-  font-size: 27px;
-  font-weight: bold;
-  pointer-events: auto;
+#hint{
+  position:absolute;
+  right:38px;
+  bottom:150px;
+  font-size:15px;
+  text-align:center;
 }
 
-#msg {
-  position: absolute;
-  left: 50%;
-  top: 60%;
-  transform: translateX(-50%);
-  font-size: 18px;
-  text-align: center;
-  text-shadow: 0 2px 4px #000;
+#start{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.8);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:5;
 }
 
-#start {
-  position: absolute;
-  inset: 0;
-  background: #05090ccc;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: auto;
+#card{
+  width:min(560px,84vw);
+  padding:36px;
+  border-radius:28px;
+  background:#10171bdd;
+  border:1px solid #465057;
+  color:#ddd;
 }
 
-#card {
-  width: min(620px, 84vw);
-  padding: 36px;
-  background: #10191dee;
-  border: 1px solid #3a474c;
-  border-radius: 28px;
+#card h1{
+  margin:0;
+  color:#ffae3d;
+  font-size:42px;
 }
 
-#card h2 {
-  color: #ffad3d;
-  font-size: 42px;
-  margin: 0 0 8px;
+#card p{
+  font-size:19px;
+  line-height:1.55;
 }
 
-#card p {
-  font-size: 18px;
-  line-height: 1.5;
+#startBtn{
+  width:100%;
+  padding:20px;
+  border:0;
+  border-radius:15px;
+  background:#e98b1c;
+  color:white;
+  font-size:24px;
+  font-weight:bold;
 }
 
-#startBtn {
-  width: 100%;
-  padding: 20px;
-  background: #e98a10;
-  border: 0;
-  border-radius: 14px;
-  color: #fff;
-  font-size: 22px;
-  font-weight: bold;
-}
+@media(max-width:650px){
 
-@media(max-width:600px) {
-
-  #job {
-    width: calc(100vw - 55px);
-    padding: 16px;
+  #panel{
+    width:46vw;
+    padding:15px;
+    top:16px;
+    left:12px;
   }
 
-  .task {
-    font-size: 16px;
+  .task{
+    font-size:13px;
+    margin:11px 0;
   }
 
-  #tools {
-    bottom: 18px;
+  #title{
+    font-size:23px;
   }
 
-  .tool {
-    width: 88px;
-    height: 65px;
-    font-size: 13px;
+  #money{
+    top:16px;
+    right:12px;
+    font-size:20px;
+    padding:14px;
   }
 
-  #joy {
-    width: 110px;
-    height: 110px;
-    bottom: 20px;
-    left: 20px;
+  .tool{
+    width:78px;
   }
 
-  #stick {
-    width: 54px;
-    height: 54px;
-    left: 25px;
-    top: 25px;
+  #use{
+    width:122px;
+    height:122px;
+    right:16px;
   }
-
-  #use {
-    width: 122px;
-    height: 122px;
-    bottom: 18px;
-    right: 18px;
-  }
-
 }
-
 </style>
 </head>
 
 <body>
 
-<div id="ui">
+<div id="start">
+  <div id="card">
 
-  <div id="job" class="panel">
+    <h1>KIWI RENOVATOR</h1>
 
-    <h1>JOB #001</h1>
+    <h3>JOB #001 — DAMAGED BEDROOM</h3>
 
-    <div id="t1" class="task">
-      □ Inspect damaged wall
+    <p><b>Property:</b> Wellington, New Zealand</p>
+
+    <p>
+      Walk around the bedroom and repair the
+      water-damaged wall.
+    </p>
+
+    <button id="startBtn">START JOB</button>
+
+  </div>
+</div>
+
+<canvas id="game"></canvas>
+
+<div id="hud">
+
+  <div id="panel">
+
+    <div id="title">JOB #001</div>
+
+    <div class="task" id="t1">
+      ☐ Inspect damaged wall
     </div>
 
-    <div id="t2" class="task">
-      □ Remove damaged GIB
+    <div class="task" id="t2">
+      ☐ Remove damaged GIB
     </div>
 
-    <div id="t3" class="task">
-      □ Inspect timber framing
+    <div class="task" id="t3">
+      ☐ Inspect timber framing
     </div>
 
-    <div id="t4" class="task">
-      □ Install new wall lining
+    <div class="task" id="t4">
+      ☐ Install new wall lining
     </div>
 
   </div>
 
-
-  <div id="cash" class="panel">
-    💰 $<span>0</span>
+  <div id="money">
+    💰 $<span id="cash">0</span>
   </div>
 
+  <div id="cross">+</div>
 
-  <div class="cross">+</div>
+  <div id="controls">
 
+    <div id="joy">
+      <div id="knob"></div>
+    </div>
 
-  <div id="msg"></div>
+    <div id="tools">
 
+      <button class="tool active" data-tool="inspect">
+        🔎<br>Inspect
+      </button>
 
-  <div id="joy">
-    <div id="stick"></div>
-  </div>
+      <button class="tool" data-tool="hammer">
+        🔨<br>Hammer
+      </button>
 
-
-  <div id="tools">
-
-    <button class="tool active" data="inspect">
-      🔎<br>
-      Inspect
-    </button>
-
-    <button class="tool" data="hammer">
-      🔨<br>
-      Hammer
-    </button>
-
-    <button class="tool" data="nail">
-      🔫<br>
-      Nail Gun
-    </button>
-
-  </div>
-
-
-  <button id="use">
-    USE<br>
-    🔨
-  </button>
-
-
-  <div id="start">
-
-    <div id="card">
-
-      <h2>KIWI RENOVATOR</h2>
-
-      <p>
-        <b>JOB #001 — DAMAGED BEDROOM</b>
-      </p>
-
-      <p>
-        <b>Property:</b>
-        Wellington, New Zealand
-      </p>
-
-      <p>
-        Inspect the water damage, remove damaged GIB,
-        check the timber framing and install new wall lining.
-      </p>
-
-      <button id="startBtn">
-        START JOB
+      <button class="tool" data-tool="nailgun">
+        🔫<br>Nail Gun
       </button>
 
     </div>
+
+    <div id="hint">
+      Walk to the damaged wall
+    </div>
+
+    <button id="use">
+      USE<br>🔨
+    </button>
 
   </div>
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
-
 
 <script>
 
 let scene;
 let camera;
 let renderer;
-let clock;
 
 let yaw = 0;
 let pitch = 0;
 
-let forward = 0;
-let side = 0;
+let moveX = 0;
+let moveY = 0;
 
 let started = false;
-let tool = "inspect";
+let looking = false;
 
-let damage;
-let ray;
+let lastX = 0;
+let lastY = 0;
 
-let inspected = false;
-let removed = false;
-let framed = false;
-let installed = false;
+let selectedTool = "inspect";
+let stage = 0;
 
+let player;
 
-const $ = x => document.getElementById(x);
+let damagedWall;
 
-
-function M(color) {
+function createMaterial(color){
 
   return new THREE.MeshStandardMaterial({
-    color: color,
-    roughness: 0.85
+    color:color,
+    roughness:0.8
   });
 
 }
 
+function addBox(
+  width,
+  height,
+  depth,
+  x,
+  y,
+  z,
+  material
+){
 
-function box(w, h, d, x, y, z, material) {
+  const mesh = new THREE.Mesh(
 
-  let mesh = new THREE.Mesh(
-
-    new THREE.BoxGeometry(w, h, d),
+    new THREE.BoxGeometry(
+      width,
+      height,
+      depth
+    ),
 
     material
 
   );
 
-  mesh.position.set(x, y, z);
+  mesh.position.set(
+    x,
+    y,
+    z
+  );
 
   mesh.castShadow = true;
+
   mesh.receiveShadow = true;
 
   scene.add(mesh);
@@ -399,458 +397,535 @@ function box(w, h, d, x, y, z, material) {
 
 }
 
-
-function init() {
+function init(){
 
   scene = new THREE.Scene();
 
   scene.background =
-    new THREE.Color(0x92a1a6);
+    new THREE.Color(0x9ab0bd);
 
   scene.fog =
-    new THREE.Fog(0x92a1a6, 12, 30);
+    new THREE.Fog(
+      0x9ab0bd,
+      8,
+      18
+    );
 
 
   camera =
     new THREE.PerspectiveCamera(
 
-      72,
+      70,
 
-      innerWidth / innerHeight,
+      window.innerWidth /
+      window.innerHeight,
 
-      0.05,
+      0.1,
 
       100
 
     );
 
 
-  camera.position.set(
-    0,
-    1.65,
-    5.5
+  player =
+    new THREE.Vector3(
+      0,
+      1.65,
+      4.5
+    );
+
+
+  camera.position.copy(
+    player
   );
-
-
-  camera.rotation.order = "YXZ";
 
 
   renderer =
     new THREE.WebGLRenderer({
-      antialias: true
+
+      canvas:
+        document.getElementById("game"),
+
+      antialias:true
+
     });
 
 
-  renderer.setPixelRatio(
-    Math.min(devicePixelRatio, 2)
-  );
-
-
   renderer.setSize(
-    innerWidth,
-    innerHeight
+    window.innerWidth,
+    window.innerHeight
   );
 
 
-  renderer.shadowMap.enabled = true;
+  renderer.setPixelRatio(
+    Math.min(
+      window.devicePixelRatio,
+      2
+    )
+  );
+
+
+  renderer.shadowMap.enabled =
+    true;
+
 
   renderer.outputEncoding =
     THREE.sRGBEncoding;
 
 
-  document.body.appendChild(
-    renderer.domElement
-  );
 
+  createRoom();
 
-  clock = new THREE.Clock();
-
-  ray = new THREE.Raycaster();
-
-
-  room();
-
-  input();
+  setupControls();
 
   animate();
 
 }
 
+function createRoom(){
 
-function room() {
-
-
-  let wall =
-    M(0xd8d0c5);
-
-
-  let floor =
-    M(0xa68b6f);
+  const wall =
+    createMaterial(
+      0xd7d1c7
+    );
 
 
-  let white =
-    M(0xe9e5dd);
+  const floor =
+    createMaterial(
+      0xa98b6c
+    );
 
 
-  let dark =
-    M(0x2a211d);
-
+  const ceiling =
+    createMaterial(
+      0xf1eee8
+    );
 
 
   /* FLOOR */
 
-  box(
-    9,
-    0.12,
-    9,
+  addBox(
+
+    8,
+
+    0.1,
+
+    8,
+
     0,
+
     0,
+
     0,
+
     floor
+
   );
 
 
   /* BACK WALL */
 
-  box(
-    9,
-    3.1,
-    0.15,
+  addBox(
+
+    8,
+
+    3,
+
+    0.12,
+
     0,
-    1.55,
-    -2.7,
+
+    1.5,
+
+    -3.8,
+
     wall
+
   );
 
 
   /* LEFT WALL */
 
-  box(
-    0.15,
-    3.1,
-    9,
-    -4.4,
-    1.55,
+  addBox(
+
+    0.12,
+
+    3,
+
+    8,
+
+    -4,
+
     1.5,
+
+    0,
+
     wall
+
   );
 
 
   /* RIGHT WALL */
 
-  box(
-    0.15,
-    3.1,
-    9,
-    4.4,
-    1.55,
+  addBox(
+
+    0.12,
+
+    3,
+
+    8,
+
+    4,
+
     1.5,
+
+    0,
+
     wall
+
   );
 
 
   /* CEILING */
 
-  box(
-    9,
+  addBox(
+
+    8,
+
     0.1,
-    9,
+
+    8,
+
     0,
-    3.1,
+
+    3,
+
     0,
-    white
+
+    ceiling
+
   );
 
 
+  /* BED */
 
-  /* BED BASE */
+  const bedBase =
+    createMaterial(
+      0x3d2b20
+    );
 
-  box(
-    2.8,
+
+  const mattress =
+    createMaterial(
+      0xe5dfd5
+    );
+
+
+  addBox(
+
+    2.4,
+
     0.45,
-    2.1,
-    1.5,
+
+    1.7,
+
+    1.7,
+
     0.45,
-    0.8,
-    dark
+
+    -1.5,
+
+    bedBase
+
   );
 
 
-  /* MATTRESS */
+  addBox(
 
-  box(
-    2.65,
-    0.35,
-    1.95,
-    1.5,
+    2.3,
+
+    0.3,
+
+    1.6,
+
+    1.7,
+
     0.82,
-    0.8,
-    white
+
+    -1.5,
+
+    mattress
+
   );
 
 
-  /* HEADBOARD */
+  /* WINDOW */
 
-  box(
-    2.65,
-    0.48,
-    0.15,
-    1.5,
-    1.22,
-    1.72,
-    white
+  const glass =
+    new THREE.MeshStandardMaterial({
+
+      color:
+        0x8db7cf,
+
+      transparent:
+        true,
+
+      opacity:
+        0.7
+
+    });
+
+
+  const windowMesh =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        1.5,
+        1.1
+      ),
+
+      glass
+
+    );
+
+
+  windowMesh.position.set(
+    -2.3,
+    1.7,
+    -3.72
   );
 
 
-
-  /* DAMAGED WALL PANEL */
-
-  box(
-    2.25,
-    1.5,
-    0.05,
-    -1,
-    1.65,
-    -2.59,
-    M(0x735f4e)
+  scene.add(
+    windowMesh
   );
 
 
-  damage =
-    scene.children[
-      scene.children.length - 1
-    ];
+  /* DAMAGED WALL */
+
+  damagedWall =
+    new THREE.Group();
 
 
-  damage.name =
-    "damage";
+  damagedWall.position.set(
+    0.4,
+    1.45,
+    -3.72
+  );
 
 
+  scene.add(
+    damagedWall
+  );
 
-  /* WATER DAMAGE MARKS */
 
-  for (
+  const damageMaterial =
+    createMaterial(
+      0x725b48
+    );
+
+
+  const damage =
+    new THREE.Mesh(
+
+      new THREE.PlaneGeometry(
+        1.5,
+        1.3
+      ),
+
+      damageMaterial
+
+    );
+
+
+  damage.position.z =
+    0.01;
+
+
+  damagedWall.add(
+    damage
+  );
+
+
+  /* WATER STAINS */
+
+  for(
     let i = 0;
-    i < 6;
+    i < 10;
     i++
-  ) {
+  ){
 
-    let spot =
+    const stain =
       new THREE.Mesh(
 
         new THREE.CircleGeometry(
-          0.2 + Math.random() * 0.18,
+
+          0.1 +
+          Math.random() * 0.2,
+
           24
+
         ),
 
         new THREE.MeshBasicMaterial({
 
-          color: 0x453b34,
+          color:
+            0x3e3025,
 
-          transparent: true,
+          transparent:
+            true,
 
-          opacity: 0.65
+          opacity:
+            0.45
 
         })
 
       );
 
 
-    spot.position.set(
+    stain.position.set(
 
-      -1.8 +
-      Math.random() * 1.5,
+      (
+        Math.random() - 0.5
+      ) * 1.2,
 
-      1 +
-      Math.random() * 1.3,
+      (
+        Math.random() - 0.5
+      ) * 1,
 
-      -2.54
+      0.02
 
     );
 
 
-    scene.add(spot);
+    damagedWall.add(
+      stain
+    );
 
   }
-
 
 
   /* LIGHTING */
 
-  let hemi =
+  const hemi =
     new THREE.HemisphereLight(
 
-      0xe8f4ff,
+      0xe4f2ff,
 
-      0x695646,
+      0x715b46,
 
-      1.7
+      1.5
 
     );
 
 
-  scene.add(hemi);
+  scene.add(
+    hemi
+  );
 
 
-
-  let sun =
+  const sunlight =
     new THREE.DirectionalLight(
 
-      0xffefce,
+      0xffe2b8,
 
-      2.2
+      2
 
     );
 
 
-  sun.position.set(
+  sunlight.position.set(
     -3,
     5,
-    3
+    2
   );
 
 
-  sun.castShadow = true;
+  sunlight.castShadow =
+    true;
 
 
-  scene.add(sun);
+  scene.add(
+    sunlight
+  );
 
 
-
-  let lamp =
+  const roomLight =
     new THREE.PointLight(
 
-      0xffd58a,
+      0xffc47d,
 
-      1.2,
+      2,
 
-      6
+      8
 
     );
 
 
-  lamp.position.set(
+  roomLight.position.set(
     0,
-    2.5,
-    1
+    2.6,
+    0
   );
 
 
-  scene.add(lamp);
-
-}
-
-
-
-function say(text) {
-
-  $("msg").textContent =
-    text;
-
-
-  clearTimeout(
-    window.mt
+  scene.add(
+    roomLight
   );
 
-
-  window.mt =
-    setTimeout(
-
-      () => {
-
-        $("msg").textContent =
-          "";
-
-      },
-
-      2500
-
-    );
-
 }
 
+function finishTask(id){
+
+  const element =
+    document.getElementById(id);
 
 
-function finish(id) {
-
-  $(id).classList.add(
+  element.classList.add(
     "done"
   );
 
 
-  $(id).textContent =
+  element.textContent =
     "☑ " +
-    $(id).textContent.slice(2);
+    element.textContent.substring(2);
 
 }
 
+function showHint(text){
 
-
-function framing() {
-
-
-  for (
-    let x = -2;
-    x <= 0;
-    x += 0.5
-  ) {
-
-    box(
-
-      0.1,
-
-      1.55,
-
-      0.14,
-
-      x,
-
-      1.65,
-
-      -2.5,
-
-      M(0x9a7048)
-
-    );
-
-  }
+  document.getElementById(
+    "hint"
+  ).textContent =
+    text;
 
 }
 
+function interact(){
 
-
-function interact() {
-
-
-  if (!started) {
-
+  if(!started){
     return;
-
   }
 
 
-  ray.setFromCamera(
-
-    {
-      x: 0,
-      y: 0
-    },
-
-    camera
-
-  );
-
-
-  let hit =
-    ray.intersectObject(
-      damage
+  const damagePosition =
+    new THREE.Vector3(
+      0.4,
+      1.4,
+      -3.5
     );
 
 
-  if (!hit.length) {
+  const distance =
+    player.distanceTo(
+      damagePosition
+    );
 
-    say(
-      "Aim at the damaged wall and move closer."
+
+  if(distance > 2.8){
+
+    showHint(
+      "Move closer to the damaged wall"
     );
 
     return;
@@ -858,211 +933,139 @@ function interact() {
   }
 
 
+  if(
+    stage === 0 &&
+    selectedTool === "inspect"
+  ){
 
-  /* INSPECT DAMAGE */
+    stage = 1;
 
-  if (
+    finishTask("t1");
 
-    tool === "inspect" &&
-
-    !inspected
-
-  ) {
-
-    inspected = true;
-
-    finish("t1");
-
-    say(
-      "Water damage confirmed. Switch to Hammer."
+    showHint(
+      "Damage found. Select Hammer."
     );
 
   }
 
 
+  else if(
+    stage === 1 &&
+    selectedTool === "hammer"
+  ){
 
-  /* REMOVE GIB */
+    stage = 2;
 
-  else if (
+    finishTask("t2");
 
-    tool === "hammer" &&
+    showHint(
+      "GIB removed. Inspect framing."
+    );
 
-    inspected &&
+  }
 
-    !removed
 
-  ) {
+  else if(
+    stage === 2 &&
+    selectedTool === "inspect"
+  ){
 
-    removed = true;
+    stage = 3;
 
-    finish("t2");
+    finishTask("t3");
 
-    damage.visible =
+    showHint(
+      "Framing is good. Use Nail Gun."
+    );
+
+  }
+
+
+  else if(
+    stage === 3 &&
+    selectedTool === "nailgun"
+  ){
+
+    stage = 4;
+
+    finishTask("t4");
+
+    damagedWall.visible =
       false;
 
 
-    framing();
-
-
-    say(
-      "GIB removed. Inspect the timber framing."
-    );
-
-  }
-
-
-
-  /* INSPECT FRAMING */
-
-  else if (
-
-    tool === "inspect" &&
-
-    removed &&
-
-    !framed
-
-  ) {
-
-    framed = true;
-
-    finish("t3");
-
-    say(
-      "Framing is sound. Switch to Nail Gun."
-    );
-
-  }
-
-
-
-  /* INSTALL NEW LINING */
-
-  else if (
-
-    tool === "nail" &&
-
-    framed &&
-
-    !installed
-
-  ) {
-
-    installed = true;
-
-    finish("t4");
-
-
-    box(
-
-      2.3,
-
-      1.55,
-
-      0.06,
-
-      -1,
-
-      1.65,
-
-      -2.58,
-
-      M(0xd8d0c5)
-
-    );
-
-
-    $("cash")
-      .querySelector("span")
-      .textContent =
+    document.getElementById(
+      "cash"
+    ).textContent =
       "850";
 
 
-    say(
+    showHint(
       "JOB COMPLETE! +$850"
     );
 
   }
 
 
+  else{
 
-  else {
-
-    say(
-
-      !inspected
-
-        ? "Inspect the damage first."
-
-        : !removed
-
-        ? "Use the Hammer."
-
-        : !framed
-
-        ? "Inspect the framing."
-
-        : "Use the Nail Gun."
-
+    showHint(
+      "Select the correct tool"
     );
 
   }
 
 }
 
+function setupControls(){
 
-
-function input() {
-
-
-  /* START BUTTON */
-
-  $("startBtn").onclick =
-    () => {
-
-      $("start").style.display =
-        "none";
-
+  document.getElementById(
+    "startBtn"
+  ).onclick =
+    function(){
 
       started = true;
 
 
-      say(
-        "Use Inspect on the damaged wall."
+      document.getElementById(
+        "start"
+      ).style.display =
+        "none";
+
+
+      showHint(
+        "Walk to the damaged wall and inspect it"
       );
 
     };
 
 
-
-  /* USE BUTTON */
-
-  $("use").onclick =
+  document.getElementById(
+    "use"
+  ).onclick =
     interact;
 
-
-
-  /* TOOL BUTTONS */
 
   document
     .querySelectorAll(".tool")
     .forEach(
 
-      button => {
+      function(button){
 
         button.onclick =
-          () => {
-
+          function(){
 
             document
               .querySelectorAll(".tool")
               .forEach(
 
-                x =>
+                function(b){
 
-                  x.classList.remove(
+                  b.classList.remove(
                     "active"
-                  )
+                  );
+
+                }
 
               );
 
@@ -1072,8 +1075,8 @@ function input() {
             );
 
 
-            tool =
-              button.dataset.data;
+            selectedTool =
+              button.dataset.tool;
 
           };
 
@@ -1082,203 +1085,210 @@ function input() {
     );
 
 
-
-  /* JOYSTICK */
-
-  let joy =
-    $("joy");
-
-
-  let stick =
-    $("stick");
+  const joy =
+    document.getElementById(
+      "joy"
+    );
 
 
-  let id =
-    null;
+  const knob =
+    document.getElementById(
+      "knob"
+    );
 
 
-  let start =
-    {
-      x: 0,
-      y: 0
-    };
+  let joyActive =
+    false;
 
 
+  function updateJoystick(event){
 
-  joy.onpointerdown =
-    event => {
-
-      id =
-        event.pointerId;
+    const rect =
+      joy.getBoundingClientRect();
 
 
-      start =
-        {
-          x: event.clientX,
-          y: event.clientY
-        };
+    let x =
+      event.clientX -
+      (
+        rect.left +
+        rect.width / 2
+      );
 
+
+    let y =
+      event.clientY -
+      (
+        rect.top +
+        rect.height / 2
+      );
+
+
+    const max =
+      36;
+
+
+    const length =
+      Math.sqrt(
+        x*x +
+        y*y
+      );
+
+
+    if(length > max){
+
+      x =
+        x / length * max;
+
+      y =
+        y / length * max;
+
+    }
+
+
+    knob.style.transform =
+      "translate(calc(-50% + " +
+      x +
+      "px), calc(-50% + " +
+      y +
+      "px))";
+
+
+    moveX =
+      x / max;
+
+
+    moveY =
+      -y / max;
+
+  }
+
+
+  joy.addEventListener(
+
+    "pointerdown",
+
+    function(event){
+
+      joyActive = true;
 
       joy.setPointerCapture(
-        id
+        event.pointerId
       );
 
-    };
+      updateJoystick(
+        event
+      );
+
+    }
+
+  );
 
 
+  joy.addEventListener(
 
-  joy.onpointermove =
-    event => {
+    "pointermove",
 
-      if (
-        event.pointerId !== id
-      ) return;
+    function(event){
 
+      if(joyActive){
 
-
-      let dx =
-        event.clientX -
-        start.x;
-
-
-      let dy =
-        event.clientY -
-        start.y;
-
-
-      let length =
-        Math.hypot(
-          dx,
-          dy
-        ) || 1;
-
-
-      let limit =
-        Math.min(
-          1,
-          34 / length
+        updateJoystick(
+          event
         );
 
+      }
 
-      dx *= limit;
+    }
 
-      dy *= limit;
-
-
-
-      stick.style.transform =
-        `translate(${dx}px, ${dy}px)`;
+  );
 
 
-      side =
-        dx / 34;
+  joy.addEventListener(
+
+    "pointerup",
+
+    function(){
+
+      joyActive =
+        false;
 
 
-      /* UP = FORWARD */
-
-      forward =
-        -dy / 34;
-
-    };
-
-
-
-  joy.onpointerup =
-    () => {
-
-      id =
-        null;
-
-
-      side =
+      moveX =
         0;
 
 
-      forward =
+      moveY =
         0;
 
 
-      stick.style.transform =
-        "";
+      knob.style.transform =
+        "translate(-50%,-50%)";
 
-    };
+    }
 
-
-
-  /* LOOK AROUND */
-
-  let lookId =
-    null;
+  );
 
 
-  let last =
-    {
-      x: 0,
-      y: 0
-    };
+  const canvas =
+    document.getElementById(
+      "game"
+    );
 
 
+  canvas.addEventListener(
 
-  renderer.domElement.onpointerdown =
-    event => {
+    "pointerdown",
 
-      if (
-        !started ||
-        event.clientY >
-        innerHeight - 190
-      ) return;
+    function(event){
 
+      looking = true;
 
-      lookId =
-        event.pointerId;
+      lastX =
+        event.clientX;
 
+      lastY =
+        event.clientY;
 
-      last =
-        {
-          x: event.clientX,
-          y: event.clientY
-        };
+    }
+
+  );
 
 
-      renderer.domElement.setPointerCapture(
-        lookId
-      );
+  canvas.addEventListener(
 
-    };
+    "pointermove",
 
+    function(event){
 
-
-  renderer.domElement.onpointermove =
-    event => {
-
-      if (
-        event.pointerId !==
-        lookId
-      ) return;
+      if(!looking){
+        return;
+      }
 
 
-      let dx =
+      const dx =
         event.clientX -
-        last.x;
+        lastX;
 
 
-      let dy =
+      const dy =
         event.clientY -
-        last.y;
+        lastY;
 
 
+      lastX =
+        event.clientX;
 
-      last =
-        {
-          x: event.clientX,
-          y: event.clientY
-        };
 
+      lastY =
+        event.clientY;
 
 
       yaw -=
-        dx * 0.004;
+        dx * 0.006;
 
+
+      pitch -=
+        dy * 0.004;
 
 
       pitch =
@@ -1287,149 +1297,163 @@ function input() {
           -1.1,
 
           Math.min(
-
             1.1,
-
-            pitch -
-            dy * 0.004
-
+            pitch
           )
 
         );
 
-    };
+    }
+
+  );
 
 
+  canvas.addEventListener(
 
-  renderer.domElement.onpointerup =
-    () => {
+    "pointerup",
 
-      lookId =
-        null;
+    function(){
 
-    };
+      looking =
+        false;
+
+    }
+
+  );
 
 
+  window.addEventListener(
 
-  /* RESIZE */
+    "resize",
 
-  onresize =
-    () => {
+    function(){
 
       camera.aspect =
-        innerWidth /
-        innerHeight;
+        window.innerWidth /
+        window.innerHeight;
 
 
       camera.updateProjectionMatrix();
 
 
       renderer.setSize(
-        innerWidth,
-        innerHeight
+
+        window.innerWidth,
+
+        window.innerHeight
+
       );
 
-    };
+    }
+
+  );
 
 }
 
+function updatePlayer(){
+
+  const speed =
+    0.055;
 
 
-function animate() {
+  const forwardX =
+    Math.sin(yaw);
 
+
+  const forwardZ =
+    Math.cos(yaw);
+
+
+  player.x +=
+
+    (
+      -forwardX *
+      moveY +
+
+      forwardZ *
+      moveX
+
+    ) *
+    speed;
+
+
+  player.z +=
+
+    (
+      -forwardZ *
+      moveY -
+
+      forwardX *
+      moveX
+
+    ) *
+    speed;
+
+
+  player.x =
+    Math.max(
+
+      -3.5,
+
+      Math.min(
+        3.5,
+        player.x
+      )
+
+    );
+
+
+  player.z =
+    Math.max(
+
+      -3.3,
+
+      Math.min(
+        3.3,
+        player.z
+      )
+
+    );
+
+
+  camera.position.copy(
+    player
+  );
+
+
+  const target =
+    new THREE.Vector3(
+
+      player.x -
+      Math.sin(yaw),
+
+      player.y +
+      Math.sin(pitch),
+
+      player.z -
+      Math.cos(yaw)
+
+    );
+
+
+  camera.lookAt(
+    target
+  );
+
+}
+
+function animate(){
 
   requestAnimationFrame(
     animate
   );
 
 
-  let delta =
-    Math.min(
-      clock.getDelta(),
-      0.05
-    );
+  if(started){
 
-
-
-  if (started) {
-
-
-    let speed =
-      2.2 * delta;
-
-
-    let forwardX =
-      Math.sin(yaw);
-
-
-    let forwardZ =
-      Math.cos(yaw);
-
-
-
-    camera.position.x +=
-
-      (
-
-        -forwardX * forward +
-
-        forwardZ * side
-
-      ) * speed;
-
-
-
-    camera.position.z +=
-
-      (
-
-        -forwardZ * forward -
-
-        forwardX * side
-
-      ) * speed;
-
-
-
-    /* ROOM BOUNDARIES */
-
-    camera.position.x =
-      Math.max(
-
-        -3.9,
-
-        Math.min(
-          3.9,
-          camera.position.x
-        )
-
-      );
-
-
-
-    camera.position.z =
-      Math.max(
-
-        -2.3,
-
-        Math.min(
-          4,
-          camera.position.z
-        )
-
-      );
-
-
-
-    camera.rotation.y =
-      yaw;
-
-
-    camera.rotation.x =
-      pitch;
+    updatePlayer();
 
   }
-
 
 
   renderer.render(
@@ -1438,8 +1462,6 @@ function animate() {
   );
 
 }
-
-
 
 init();
 
