@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon Word Find</title>
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  padding: 15px;
+  font-family: Arial, sans-serif;
+  background: #f4f6fa;
+  color: #172033;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 5px;
+}
+
+p {
+  text-align: center;
+  color: #666;
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 3px;
+  max-width: 700px;
+  margin: 20px auto;
+}
+
+.cell {
+  aspect-ratio: 1;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+  font-size: clamp(11px, 3vw, 20px);
+}
+
+.selected {
+  background: #ffe05c;
+}
+
+.found {
+  background: #71e391;
+  color: #083d1b;
+}
+
+.wrong {
+  animation: flashRed 0.6s;
+}
+
+@keyframes flashRed {
+  0%, 100% { background: white; }
+  50% { background: #ff5555; color: white; }
+}
+
+#current {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  min-height: 30px;
+}
+
+#message {
+  text-align: center;
+  font-weight: bold;
+  min-height: 25px;
+}
+
+#words {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.word {
+  background: white;
+  padding: 7px 10px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.done {
+  background: #a9efbe;
+  text-decoration: line-through;
+}
+
+button {
+  display: block;
+  margin: 20px auto;
+  padding: 13px 25px;
+  border: none;
+  border-radius: 10px;
+  background: #2864d7;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<h1>⚡ Pokémon Word Find</h1>
+<p>Tap each letter in order to find a Pokémon!</p>
+
+<div id="grid"></div>
+
+<div id="current"></div>
+<div id="message">Find a Pokémon!</div>
+
+<div id="words"></div>
+
+<button onclick="newGame()">🔄 New Puzzle</button>
+
+<script>
+
+const WORDS = [
+"PIKACHU",
+"EEVEE",
+"GENGAR",
+"SNORLAX",
+"LUCARIO",
+"MEWTWO",
+"SQUIRTLE",
+"BULBASAUR",
+"CHARIZARD",
+"RAYQUAZA"
+];
+
+const SIZE = 15;
+
+const DIRECTIONS = [
+[0,1],
+[1,0],
+[1,1],
+[1,-1]
+];
+
+let grid;
+let positions;
+let selected = [];
+let found = new Set();
+
+function newGame() {
+
+grid = Array.from(
+{length: SIZE},
+() => Array(SIZE).fill("")
+);
+
+positions = {};
+selected = [];
+found = new Set();
+
+WORDS.forEach(placeWord);
+
+for (let r = 0; r < SIZE; r++) {
+
+for (let c = 0; c < SIZE; c++) {
+
+if (!grid[r][c]) {
+
+grid[r][c] =
+"ABCDEFGHIJKLMNOPQRSTUVWXYZ"[
+Math.floor(Math.random() * 26)
+];
+
+}
+
+}
+
+}
+
+render();
+
+}
+
+function placeWord(word) {
+
+for (let attempt = 0; attempt < 5000; attempt++) {
+
+let direction =
+DIRECTIONS[
+Math.floor(Math.random() * DIRECTIONS.length)
+];
+
+let dr = direction[0];
+let dc = direction[1];
+
+let row =
+Math.floor(Math.random() * SIZE);
+
+let col =
+Math.floor(Math.random() * SIZE);
+
+let endRow =
+row + dr * (word.length - 1);
+
+let endCol =
+col + dc * (word.length - 1);
+
+if (
+endRow < 0 ||
+endRow >= SIZE ||
+endCol < 0 ||
+endCol >= SIZE
+) continue;
+
+let valid = true;
+
+for (let i = 0; i < word.length; i++) {
+
+let r = row + dr * i;
+let c = col + dc * i;
+
+if (
+grid[r][c] &&
+grid[r][c] !== word[i]
+) {
+
+valid = false;
+
+}
+
+}
+
+if (!valid) continue;
+
+positions[word] = [];
+
+for (let i = 0; i < word.length; i++) {
+
+let r = row + dr * i;
+let c = col + dc * i;
+
+grid[r][c] = word[i];
+
+positions[word].push([r,c]);
+
+}
+
+return;
+
+}
+
+}
+
+function render() {
+
+let gridElement =
+document.getElementById("grid");
+
+gridElement.innerHTML = "";
+
+for (let r = 0; r < SIZE; r++) {
+
+for (let c = 0; c < SIZE; c++) {
+
+let cell =
+document.createElement("div");
+
+cell.className = "cell";
+
+cell.textContent =
+grid[r][c];
+
+cell.dataset.row = r;
+cell.dataset.col = c;
+
+cell.addEventListener(
+"click",
+function() {
+selectCell(cell);
+}
+);
+
+gridElement.appendChild(cell);
+
+}
+
+}
+
+let wordsElement =
+document.getElementById("words");
+
+wordsElement.innerHTML =
+WORDS.map(word =>
+`<span class="word" id="word-${word}">
+${word}
+</span>`
+).join("");
+
+}
+
+function selectCell(cell) {
+
+if (
+cell.classList.contains("found")
+) return;
+
+if (
+selected.includes(cell)
+) {
+
+wrong();
+
+return;
+
+}
+
+selected.push(cell);
+
+cell.classList.add("selected");
+
+updateCurrent();
+
+let letters =
+selected
+.map(cell => cell.textContent)
+.join("");
+
+let reversed =
+letters
+.split("")
+.reverse()
+.join("");
+
+let possible =
+WORDS.some(word =>
+word.startsWith(letters) ||
+word.startsWith(reversed)
+);
+
+let match =
+WORDS.find(word =>
+word === letters ||
+word === reversed
+);
+
+if (match) {
+
+checkMatch(match);
+
+return;
+
+}
+
+if (!possible) {
+
+wrong();
+
+}
+
+}
+
+function checkMatch(word) {
+
+let correct =
+positions[word];
+
+let selectedPositions =
+selected.map(cell => [
+
+Number(cell.dataset.row),
+Number(cell.dataset.col)
+
+]);
+
+let forward =
+correct.every(
+(pos,index) =>
+
+pos[0] ===
+selectedPositions[index][0]
+
+&&
+
+pos[1] ===
+selectedPositions[index][1]
+
+);
+
+let backward =
+correct.every(
+(pos,index) => {
+
+let reverseIndex =
+selectedPositions.length - 1 - index;
+
+return (
+
+pos[0] ===
+selectedPositions[reverseIndex][0]
+
+&&
+
+pos[1] ===
+selectedPositions[reverseIndex][1]
+
+);
+
+}
+);
+
+if (
+forward ||
+backward
+) {
+
+selected.forEach(cell => {
+
+cell.classList.remove("selected");
+
+cell.classList.add("found");
+
+});
+
+found.add(word);
+
+document
+.getElementById(
+"word-" + word
+)
+.classList.add("done");
+
+document
+.getElementById("message")
+.textContent =
+"🎉 Correct! " + word;
+
+selected = [];
+
+updateCurrent();
+
+} else {
+
+wrong();
+
+}
+
+}
+
+function wrong() {
+
+document
+.getElementById("message")
+.textContent =
+"❌ Wrong! Try again!";
+
+selected.forEach(cell => {
+
+cell.classList.remove("selected");
+
+cell.classList.add("wrong");
+
+setTimeout(() => {
+
+cell.classList.remove("wrong");
+
+}, 600);
+
+});
+
+selected = [];
+
+updateCurrent();
+
+}
+
+function updateCurrent() {
+
+document
+.getElementById("current")
+.textContent =
+selected
+.map(cell => cell.textContent)
+.join("");
+
+}
+
+newGame();
+
+</script>
+
+</body>
+</html>
