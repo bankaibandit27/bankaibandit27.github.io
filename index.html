@@ -2,497 +2,1241 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pokémon Word Find</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<title>Kiwi Renovator</title>
+
 <style>
-* { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
 
-body {
-  margin: 0;
-  padding: 15px;
-  font-family: Arial, sans-serif;
-  background: #f4f6fa;
-  color: #172033;
-}
+  body {
+    margin: 0;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+    background: #111;
+    color: white;
+    touch-action: none;
+  }
 
-h1 {
-  text-align: center;
-  margin-bottom: 5px;
-}
+  canvas {
+    display: block;
+  }
 
-p {
-  text-align: center;
-  color: #666;
-}
+  #loading {
+    position: fixed;
+    inset: 0;
+    background: #182027;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    text-align: center;
+  }
 
-#grid {
-  display: grid;
-  grid-template-columns: repeat(15, 1fr);
-  gap: 3px;
-  max-width: 700px;
-  margin: 20px auto;
-}
+  #loading h1 {
+    font-size: 38px;
+    margin-bottom: 10px;
+  }
 
-.cell {
-  aspect-ratio: 1;
-  background: white;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  cursor: pointer;
-  user-select: none;
-  font-size: clamp(11px, 3vw, 20px);
-}
+  #loading p {
+    color: #b8c4cc;
+    margin-bottom: 25px;
+  }
 
-.selected {
-  background: #ffe05c;
-}
+  #start {
+    background: #e48b2c;
+    color: white;
+    border: none;
+    padding: 18px 35px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+  }
 
-.found {
-  background: #71e391;
-  color: #083d1b;
-}
+  #ui {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
 
-.wrong {
-  animation: flashRed 0.6s;
-}
+  #topbar {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    display: flex;
+    justify-content: space-between;
+  }
 
-@keyframes flashRed {
-  0%, 100% { background: white; }
-  50% { background: #ff5555; color: white; }
-}
+  .panel {
+    background: rgba(10, 15, 18, 0.8);
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius: 10px;
+    padding: 12px 15px;
+    backdrop-filter: blur(8px);
+  }
 
-#current {
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  min-height: 30px;
-}
+  #job {
+    max-width: 310px;
+  }
 
-#message {
-  text-align: center;
-  font-weight: bold;
-  min-height: 25px;
-}
+  #job h3 {
+    margin: 0 0 8px;
+    color: #f0a13b;
+  }
 
-#words {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  margin-top: 15px;
-}
+  #job p {
+    margin: 5px 0;
+    font-size: 14px;
+  }
 
-.word {
-  background: white;
-  padding: 7px 10px;
-  border-radius: 15px;
-  font-weight: bold;
-}
+  .done {
+    color: #72d572;
+    text-decoration: line-through;
+  }
 
-.done {
-  background: #a9efbe;
-  text-decoration: line-through;
-}
+  #money {
+    font-size: 18px;
+    font-weight: bold;
+    height: fit-content;
+  }
 
-button {
-  display: block;
-  margin: 20px auto;
-  padding: 13px 25px;
-  border: none;
-  border-radius: 10px;
-  background: #2864d7;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-}
+  #crosshair {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 22px;
+    height: 22px;
+    transform: translate(-50%, -50%);
+  }
+
+  #crosshair::before,
+  #crosshair::after {
+    content: "";
+    position: absolute;
+    background: white;
+  }
+
+  #crosshair::before {
+    width: 2px;
+    height: 22px;
+    left: 10px;
+  }
+
+  #crosshair::after {
+    height: 2px;
+    width: 22px;
+    top: 10px;
+  }
+
+  #prompt {
+    position: absolute;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.75);
+    padding: 12px 20px;
+    border-radius: 10px;
+    text-align: center;
+    display: none;
+  }
+
+  #message {
+    position: absolute;
+    top: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(34, 140, 60, 0.9);
+    padding: 12px 20px;
+    border-radius: 8px;
+    display: none;
+  }
+
+  /* MOBILE CONTROLS */
+
+  #mobileControls {
+    display: none;
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 15;
+  }
+
+  #joystick {
+    position: absolute;
+    bottom: 35px;
+    left: 30px;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.12);
+    border: 2px solid rgba(255,255,255,0.3);
+    pointer-events: auto;
+  }
+
+  #stick {
+    position: absolute;
+    width: 55px;
+    height: 55px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.55);
+    left: 36px;
+    top: 36px;
+  }
+
+  #use {
+    position: absolute;
+    right: 35px;
+    bottom: 50px;
+    width: 105px;
+    height: 105px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.5);
+    background: rgba(228,139,44,0.8);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    pointer-events: auto;
+  }
+
+  #lookHint {
+    position: absolute;
+    right: 25px;
+    bottom: 175px;
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  @media (max-width: 800px) {
+    #mobileControls {
+      display: block;
+    }
+
+    #topbar {
+      top: 8px;
+      left: 8px;
+      right: 8px;
+    }
+
+    #job {
+      max-width: 235px;
+    }
+
+    #job p {
+      font-size: 12px;
+    }
+  }
 </style>
 </head>
 
 <body>
 
-<h1>⚡ Pokémon Word Find</h1>
-<p>Tap each letter in order to find a Pokémon!</p>
+<div id="loading">
+  <h1>🔨 KIWI RENOVATOR</h1>
+  <p>Water Damage Repair<br>Early 2000s NZ Home</p>
+  <button id="start">START JOB</button>
+</div>
 
-<div id="grid"></div>
+<div id="ui">
 
-<div id="current"></div>
-<div id="message">Find a Pokémon!</div>
+  <div id="topbar">
 
-<div id="words"></div>
+    <div id="job" class="panel">
+      <h3>JOB #001</h3>
+      <p>☐ Find the damaged bedroom</p>
+      <p id="repairTask">☐ Repair damaged wall</p>
+    </div>
 
-<button onclick="newGame()">🔄 New Puzzle</button>
+    <div id="money" class="panel">
+      💰 $0
+    </div>
 
-<script>
+  </div>
 
-const WORDS = [
-"PIKACHU",
-"EEVEE",
-"GENGAR",
-"SNORLAX",
-"LUCARIO",
-"MEWTWO",
-"SQUIRTLE",
-"BULBASAUR",
-"CHARIZARD",
-"RAYQUAZA"
-];
+  <div id="crosshair"></div>
 
-const SIZE = 15;
+  <div id="prompt">
+    Damaged GIB wall<br>
+    <strong>Press E or USE to repair</strong>
+  </div>
 
-const DIRECTIONS = [
-[0,1],
-[1,0],
-[1,1],
-[1,-1]
-];
+  <div id="message"></div>
 
-let grid;
-let positions;
-let selected = [];
-let found = new Set();
+</div>
 
-function newGame() {
+<div id="mobileControls">
 
-grid = Array.from(
-{length: SIZE},
-() => Array(SIZE).fill("")
-);
+  <div id="joystick">
+    <div id="stick"></div>
+  </div>
 
-positions = {};
-selected = [];
-found = new Set();
+  <div id="lookHint">
+    Drag screen<br>to look around
+  </div>
 
-WORDS.forEach(placeWord);
+  <button id="use">USE<br>🔨</button>
 
-for (let r = 0; r < SIZE; r++) {
+</div>
 
-for (let c = 0; c < SIZE; c++) {
 
-if (!grid[r][c]) {
+<script type="module">
 
-grid[r][c] =
-"ABCDEFGHIJKLMNOPQRSTUVWXYZ"[
-Math.floor(Math.random() * 26)
-];
+import * as THREE from
+'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
 
-}
 
-}
+let scene, camera, renderer;
+let yaw = 0;
+let pitch = 0;
 
-}
+let keys = {};
+let damagedWall;
+let repaired = false;
 
-render();
+let moveX = 0;
+let moveZ = 0;
 
-}
+const raycaster = new THREE.Raycaster();
 
-function placeWord(word) {
 
-for (let attempt = 0; attempt < 5000; attempt++) {
+/* ---------- START ---------- */
 
-let direction =
-DIRECTIONS[
-Math.floor(Math.random() * DIRECTIONS.length)
-];
+document.getElementById("start").addEventListener("click", () => {
 
-let dr = direction[0];
-let dc = direction[1];
+  document.getElementById("loading").style.display = "none";
 
-let row =
-Math.floor(Math.random() * SIZE);
-
-let col =
-Math.floor(Math.random() * SIZE);
-
-let endRow =
-row + dr * (word.length - 1);
-
-let endCol =
-col + dc * (word.length - 1);
-
-if (
-endRow < 0 ||
-endRow >= SIZE ||
-endCol < 0 ||
-endCol >= SIZE
-) continue;
-
-let valid = true;
-
-for (let i = 0; i < word.length; i++) {
-
-let r = row + dr * i;
-let c = col + dc * i;
-
-if (
-grid[r][c] &&
-grid[r][c] !== word[i]
-) {
-
-valid = false;
-
-}
-
-}
-
-if (!valid) continue;
-
-positions[word] = [];
-
-for (let i = 0; i < word.length; i++) {
-
-let r = row + dr * i;
-let c = col + dc * i;
-
-grid[r][c] = word[i];
-
-positions[word].push([r,c]);
-
-}
-
-return;
-
-}
-
-}
-
-function render() {
-
-let gridElement =
-document.getElementById("grid");
-
-gridElement.innerHTML = "";
-
-for (let r = 0; r < SIZE; r++) {
-
-for (let c = 0; c < SIZE; c++) {
-
-let cell =
-document.createElement("div");
-
-cell.className = "cell";
-
-cell.textContent =
-grid[r][c];
-
-cell.dataset.row = r;
-cell.dataset.col = c;
-
-cell.addEventListener(
-"click",
-function() {
-selectCell(cell);
-}
-);
-
-gridElement.appendChild(cell);
-
-}
-
-}
-
-let wordsElement =
-document.getElementById("words");
-
-wordsElement.innerHTML =
-WORDS.map(word =>
-`<span class="word" id="word-${word}">
-${word}
-</span>`
-).join("");
-
-}
-
-function selectCell(cell) {
-
-if (
-cell.classList.contains("found")
-) return;
-
-if (
-selected.includes(cell)
-) {
-
-wrong();
-
-return;
-
-}
-
-selected.push(cell);
-
-cell.classList.add("selected");
-
-updateCurrent();
-
-let letters =
-selected
-.map(cell => cell.textContent)
-.join("");
-
-let reversed =
-letters
-.split("")
-.reverse()
-.join("");
-
-let possible =
-WORDS.some(word =>
-word.startsWith(letters) ||
-word.startsWith(reversed)
-);
-
-let match =
-WORDS.find(word =>
-word === letters ||
-word === reversed
-);
-
-if (match) {
-
-checkMatch(match);
-
-return;
-
-}
-
-if (!possible) {
-
-wrong();
-
-}
-
-}
-
-function checkMatch(word) {
-
-let correct =
-positions[word];
-
-let selectedPositions =
-selected.map(cell => [
-
-Number(cell.dataset.row),
-Number(cell.dataset.col)
-
-]);
-
-let forward =
-correct.every(
-(pos,index) =>
-
-pos[0] ===
-selectedPositions[index][0]
-
-&&
-
-pos[1] ===
-selectedPositions[index][1]
-
-);
-
-let backward =
-correct.every(
-(pos,index) => {
-
-let reverseIndex =
-selectedPositions.length - 1 - index;
-
-return (
-
-pos[0] ===
-selectedPositions[reverseIndex][0]
-
-&&
-
-pos[1] ===
-selectedPositions[reverseIndex][1]
-
-);
-
-}
-);
-
-if (
-forward ||
-backward
-) {
-
-selected.forEach(cell => {
-
-cell.classList.remove("selected");
-
-cell.classList.add("found");
+  init();
+  animate();
 
 });
 
-found.add(word);
 
-document
-.getElementById(
-"word-" + word
-)
-.classList.add("done");
+/* ---------- THREE JS ---------- */
 
-document
-.getElementById("message")
-.textContent =
-"🎉 Correct! " + word;
+function init() {
 
-selected = [];
+  scene = new THREE.Scene();
 
-updateCurrent();
+  scene.background = new THREE.Color(0x9bb8c9);
+  scene.fog = new THREE.Fog(0x9bb8c9, 20, 70);
 
-} else {
 
-wrong();
+  camera = new THREE.PerspectiveCamera(
+    75,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    100
+  );
+
+  camera.position.set(0, 1.7, 8);
+
+
+  renderer = new THREE.WebGLRenderer({
+    antialias: true
+  });
+
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
+
+  renderer.shadowMap.enabled = true;
+
+  document.body.appendChild(renderer.domElement);
+
+
+  /* LIGHTING */
+
+  const sun = new THREE.DirectionalLight(
+    0xffffff,
+    2
+  );
+
+  sun.position.set(10, 15, 8);
+  sun.castShadow = true;
+
+  scene.add(sun);
+
+  scene.add(
+    new THREE.HemisphereLight(
+      0xbfdcff,
+      0x5b6b4b,
+      2
+    )
+  );
+
+
+  createHouse();
+  createFurniture();
+
+
+  window.addEventListener(
+    "resize",
+    resize
+  );
+
+  window.addEventListener(
+    "keydown",
+    keyDown
+  );
+
+  window.addEventListener(
+    "keyup",
+    keyUp
+  );
+
+
+  /* DESKTOP MOUSE LOOK */
+
+  renderer.domElement.addEventListener(
+    "click",
+    () => {
+
+      if (window.innerWidth > 800) {
+
+        renderer.domElement.requestPointerLock();
+
+      }
+
+    }
+  );
+
+
+  document.addEventListener(
+    "mousemove",
+    mouseLook
+  );
+
+
+  /* MOBILE LOOK */
+
+  let lastX = 0;
+  let lastY = 0;
+  let touching = false;
+
+
+  renderer.domElement.addEventListener(
+    "touchstart",
+    (e) => {
+
+      if (
+        e.touches[0].clientX >
+        window.innerWidth * 0.35
+      ) {
+
+        touching = true;
+
+        lastX =
+          e.touches[0].clientX;
+
+        lastY =
+          e.touches[0].clientY;
+
+      }
+
+    },
+    { passive: false }
+  );
+
+
+  renderer.domElement.addEventListener(
+    "touchmove",
+    (e) => {
+
+      if (!touching) return;
+
+      const touch = e.touches[0];
+
+      yaw -=
+        (touch.clientX - lastX) *
+        0.006;
+
+      pitch -=
+        (touch.clientY - lastY) *
+        0.006;
+
+      pitch = Math.max(
+        -1.4,
+        Math.min(1.4, pitch)
+      );
+
+      lastX = touch.clientX;
+      lastY = touch.clientY;
+
+    },
+    { passive: false }
+  );
+
+
+  renderer.domElement.addEventListener(
+    "touchend",
+    () => {
+      touching = false;
+    }
+  );
+
+
+  setupJoystick();
+
+
+  document
+    .getElementById("use")
+    .addEventListener(
+      "click",
+      tryRepair
+    );
 
 }
 
+
+/* ---------- HOUSE ---------- */
+
+function createHouse() {
+
+  /* GROUND */
+
+  const ground = new THREE.Mesh(
+
+    new THREE.PlaneGeometry(
+      100,
+      100
+    ),
+
+    new THREE.MeshStandardMaterial({
+      color: 0x5c8245
+    })
+
+  );
+
+  ground.rotation.x =
+    -Math.PI / 2;
+
+  ground.receiveShadow = true;
+
+  scene.add(ground);
+
+
+  /* FLOOR */
+
+  const floor = new THREE.Mesh(
+
+    new THREE.BoxGeometry(
+      12,
+      0.15,
+      12
+    ),
+
+    new THREE.MeshStandardMaterial({
+      color: 0x8b765c
+    })
+
+  );
+
+  floor.position.y = 0;
+
+  floor.receiveShadow = true;
+
+  scene.add(floor);
+
+
+  /* ROOM WALL MATERIAL */
+
+  const wallMaterial =
+    new THREE.MeshStandardMaterial({
+      color: 0xe6e1d8
+    });
+
+
+  /* BACK WALL */
+
+  addWall(
+    0,
+    2.5,
+    -5.8,
+    12,
+    5,
+    0.25,
+    wallMaterial
+  );
+
+
+  /* LEFT WALL */
+
+  addWall(
+    -5.8,
+    2.5,
+    0,
+    0.25,
+    5,
+    12,
+    wallMaterial
+  );
+
+
+  /* RIGHT WALL */
+
+  addWall(
+    5.8,
+    2.5,
+    0,
+    0.25,
+    5,
+    12,
+    wallMaterial
+  );
+
+
+  /* CEILING */
+
+  const ceiling = new THREE.Mesh(
+
+    new THREE.BoxGeometry(
+      12,
+      0.2,
+      12
+    ),
+
+    new THREE.MeshStandardMaterial({
+      color: 0xf0ede7
+    })
+
+  );
+
+  ceiling.position.y = 5;
+
+  scene.add(ceiling);
+
+
+  /* DAMAGED WALL */
+
+  damagedWall = new THREE.Mesh(
+
+    new THREE.BoxGeometry(
+      3.2,
+      2.6,
+      0.2
+    ),
+
+    new THREE.MeshStandardMaterial({
+      color: 0x795b45,
+      roughness: 1
+    })
+
+  );
+
+  damagedWall.position.set(
+    0,
+    2.2,
+    -5.55
+  );
+
+  damagedWall.name =
+    "damagedWall";
+
+  scene.add(damagedWall);
+
+
+  /* WATER STAIN */
+
+  const stain = new THREE.Mesh(
+
+    new THREE.CircleGeometry(
+      0.7,
+      32
+    ),
+
+    new THREE.MeshStandardMaterial({
+      color: 0x4d4035
+    })
+
+  );
+
+  stain.position.set(
+    0.6,
+    3.2,
+    -5.67
+  );
+
+  scene.add(stain);
+
+
+  /* NZ STYLE WINDOW */
+
+  const windowFrame =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.5,
+        1.7,
+        0.15
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x444444
+      })
+
+    );
+
+  windowFrame.position.set(
+    -5.65,
+    3,
+    -1
+  );
+
+  scene.add(windowFrame);
+
+
+  /* WINDOW GLASS */
+
+  const glass =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.15,
+        1.35,
+        0.08
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x8fc7dd,
+        transparent: true,
+        opacity: 0.7
+      })
+
+    );
+
+  glass.position.set(
+    -5.78,
+    3,
+    -1
+  );
+
+  scene.add(glass);
+
+
 }
 
-function wrong() {
 
-document
-.getElementById("message")
-.textContent =
-"❌ Wrong! Try again!";
+/* ---------- WALL FUNCTION ---------- */
 
-selected.forEach(cell => {
+function addWall(
+  x,
+  y,
+  z,
+  width,
+  height,
+  depth,
+  material
+) {
 
-cell.classList.remove("selected");
+  const wall =
+    new THREE.Mesh(
 
-cell.classList.add("wrong");
+      new THREE.BoxGeometry(
+        width,
+        height,
+        depth
+      ),
 
-setTimeout(() => {
+      material
 
-cell.classList.remove("wrong");
+    );
 
-}, 600);
+  wall.position.set(
+    x,
+    y,
+    z
+  );
 
-});
+  wall.receiveShadow = true;
 
-selected = [];
-
-updateCurrent();
+  scene.add(wall);
 
 }
 
-function updateCurrent() {
 
-document
-.getElementById("current")
-.textContent =
-selected
-.map(cell => cell.textContent)
-.join("");
+/* ---------- FURNITURE ---------- */
+
+function createFurniture() {
+
+  /* BED */
+
+  const bed =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        3,
+        0.6,
+        2
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x555555
+      })
+
+    );
+
+  bed.position.set(
+    3,
+    0.6,
+    -2
+  );
+
+  scene.add(bed);
+
+
+  /* MATTRESS */
+
+  const mattress =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        2.9,
+        0.3,
+        1.9
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0xe8e8e2
+      })
+
+    );
+
+  mattress.position.set(
+    3,
+    1.05,
+    -2
+  );
+
+  scene.add(mattress);
+
+
+  /* TOOLBOX */
+
+  const toolbox =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        1.2,
+        0.5,
+        0.6
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0xd32f2f
+      })
+
+    );
+
+  toolbox.position.set(
+    -3.5,
+    0.4,
+    2
+  );
+
+  scene.add(toolbox);
 
 }
 
-newGame();
+
+/* ---------- KEYBOARD ---------- */
+
+function keyDown(e) {
+
+  keys[e.key.toLowerCase()] =
+    true;
+
+  if (
+    e.key.toLowerCase() === "e"
+  ) {
+
+    tryRepair();
+
+  }
+
+}
+
+
+function keyUp(e) {
+
+  keys[e.key.toLowerCase()] =
+    false;
+
+}
+
+
+/* ---------- MOUSE LOOK ---------- */
+
+function mouseLook(e) {
+
+  if (
+    document.pointerLockElement !==
+    renderer.domElement
+  ) return;
+
+
+  yaw -= e.movementX * 0.002;
+
+  pitch -=
+    e.movementY * 0.002;
+
+
+  pitch = Math.max(
+    -1.4,
+    Math.min(1.4, pitch)
+  );
+
+}
+
+
+/* ---------- JOYSTICK ---------- */
+
+function setupJoystick() {
+
+  const joystick =
+    document.getElementById(
+      "joystick"
+    );
+
+  const stick =
+    document.getElementById(
+      "stick"
+    );
+
+
+  joystick.addEventListener(
+    "touchmove",
+    (e) => {
+
+      e.preventDefault();
+
+      const rect =
+        joystick.getBoundingClientRect();
+
+      const touch =
+        e.touches[0];
+
+
+      let x =
+        touch.clientX -
+        (rect.left + rect.width / 2);
+
+      let y =
+        touch.clientY -
+        (rect.top + rect.height / 2);
+
+
+      const distance =
+        Math.sqrt(
+          x * x + y * y
+        );
+
+      const max = 45;
+
+
+      if (distance > max) {
+
+        x =
+          (x / distance) * max;
+
+        y =
+          (y / distance) * max;
+
+      }
+
+
+      stick.style.transform =
+        `translate(${x}px, ${y}px)`;
+
+
+      moveX = x / max;
+      moveZ = y / max;
+
+    },
+    { passive: false }
+  );
+
+
+  joystick.addEventListener(
+    "touchend",
+    () => {
+
+      moveX = 0;
+      moveZ = 0;
+
+      stick.style.transform =
+        "translate(0px, 0px)";
+
+    }
+  );
+
+}
+
+
+/* ---------- INTERACTION ---------- */
+
+function tryRepair() {
+
+  if (repaired) return;
+
+
+  const direction =
+    new THREE.Vector3();
+
+  camera.getWorldDirection(
+    direction
+  );
+
+
+  raycaster.set(
+    camera.position,
+    direction
+  );
+
+
+  const hits =
+    raycaster.intersectObject(
+      damagedWall
+    );
+
+
+  if (
+    hits.length > 0 &&
+    hits[0].distance < 5
+  ) {
+
+    repaired = true;
+
+
+    damagedWall.material.color.set(
+      0xe6e1d8
+    );
+
+
+    document
+      .getElementById(
+        "repairTask"
+      )
+      .innerHTML =
+      "☑ Repair damaged wall";
+
+    document
+      .getElementById(
+        "repairTask"
+      )
+      .classList.add(
+        "done"
+      );
+
+
+    document
+      .getElementById(
+        "money"
+      )
+      .innerHTML =
+      "💰 $500";
+
+
+    showMessage(
+      "Great job! Wall repaired. +$500"
+    );
+
+
+    document
+      .getElementById(
+        "prompt"
+      )
+      .style.display =
+      "none";
+
+  } else {
+
+    showMessage(
+      "Get closer and aim at the damaged wall."
+    );
+
+  }
+
+}
+
+
+function showMessage(text) {
+
+  const message =
+    document.getElementById(
+      "message"
+    );
+
+  message.textContent = text;
+
+  message.style.display =
+    "block";
+
+
+  setTimeout(
+    () => {
+
+      message.style.display =
+        "none";
+
+    },
+    2500
+  );
+
+}
+
+
+/* ---------- GAME LOOP ---------- */
+
+function animate() {
+
+  requestAnimationFrame(
+    animate
+  );
+
+
+  const speed = 0.06;
+
+
+  let forward = 0;
+  let sideways = 0;
+
+
+  if (keys["w"]) forward += 1;
+  if (keys["s"]) forward -= 1;
+
+  if (keys["a"]) sideways -= 1;
+  if (keys["d"]) sideways += 1;
+
+
+  forward += -moveZ;
+  sideways += moveX;
+
+
+  const direction =
+    new THREE.Vector3(
+      Math.sin(yaw),
+      0,
+      Math.cos(yaw)
+    );
+
+
+  const right =
+    new THREE.Vector3(
+      Math.cos(yaw),
+      0,
+      -Math.sin(yaw)
+    );
+
+
+  camera.position.addScaledVector(
+    direction,
+    -forward * speed
+  );
+
+
+  camera.position.addScaledVector(
+    right,
+    sideways * speed
+  );
+
+
+  /* ROOM BOUNDARIES */
+
+  camera.position.x =
+    Math.max(
+      -5.3,
+      Math.min(
+        5.3,
+        camera.position.x
+      )
+    );
+
+
+  camera.position.z =
+    Math.max(
+      -5.3,
+      Math.min(
+        5.3,
+        camera.position.z
+      )
+    );
+
+
+  camera.rotation.order =
+    "YXZ";
+
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
+
+
+  checkWallPrompt();
+
+
+  renderer.render(
+    scene,
+    camera
+  );
+
+}
+
+
+/* ---------- PROMPT ---------- */
+
+function checkWallPrompt() {
+
+  if (repaired) return;
+
+
+  const distance =
+    camera.position.distanceTo(
+      damagedWall.position
+    );
+
+
+  const prompt =
+    document.getElementById(
+      "prompt"
+    );
+
+
+  if (distance < 5) {
+
+    prompt.style.display =
+      "block";
+
+  } else {
+
+    prompt.style.display =
+      "none";
+
+  }
+
+}
+
+
+/* ---------- RESIZE ---------- */
+
+function resize() {
+
+  camera.aspect =
+    window.innerWidth /
+    window.innerHeight;
+
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(
+    window.innerWidth,
+    window.innerHeight
+  );
+
+}
 
 </script>
 
